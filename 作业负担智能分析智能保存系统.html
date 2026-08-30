@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>作业负担智能分析智能保存系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --accent-color: #CDDC39;
+            --dark-color: #2E7D32;
+            --light-color: #f5f5f5;
+            --success-color: #00C853;
+            --warning-color: #FFAB00;
+            --danger-color: #FF3D00;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+            color: #333;
+            min-height: 100vh;
+            position: relative; /* 为水印定位做准备 */
+        }
+        
+        /* 新增水印样式 */
+        .watermark {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            color: blue;
+            font-size: 14px;
+            text-align: right;
+            line-height: 1.5;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(46, 125, 50, 0.1);
+            position: relative;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(76, 175, 80, 0.1);
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--dark-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            margin: 10px auto 0;
+            border-radius: 3px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .section-title {
+            color: var(--dark-color);
+            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            margin: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        input, select, textarea {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            margin: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            transition: all 0.3s;
+            font-family: 'Microsoft YaHei', sans-serif;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3), inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .subject-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(233, 245, 233, 0.5);
+            border-radius: 8px;
+        }
+        
+        .subject-name {
+            width: 100px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            width: 100%;
+        }
+        
+        .task-label {
+            margin-right: 10px;
+            width: 120px;
+        }
+        
+        .task-input {
+            width: 80px;
+        }
+        
+        .task-difficulty {
+            width: 120px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .file-upload-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(233, 245, 233, 0.5);
+            border-radius: 8px;
+            border: 1px dashed rgba(76, 175, 80, 0.3);
+            text-align: center;
+        }
+        
+        .file-upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-status {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--dark-color);
+        }
+        
+        .report-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        
+        .report-content {
+            white-space: pre-wrap;
+            font-family: 'Microsoft YaHei', sans-serif;
+            padding: 15px;
+            background: rgba(233, 245, 233, 0.3);
+            border-radius: 8px;
+            max-height: none;
+            overflow-y: visible;
+        }
+        
+        .status-message {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .success {
+            background-color: rgba(0, 200, 83, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(0, 200, 83, 0.3);
+        }
+        
+        .error {
+            background-color: rgba(255, 61, 0, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(255, 61, 0, 0.3);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2196F3, #64B5F6);
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(204, 214, 246, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .subject-progress {
+            margin: 15px 0;
+        }
+        
+        .subject-progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .modal-body {
+            margin-bottom: 15px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        /* 报告打印样式 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-report, #printable-report * {
+                visibility: visible;
+            }
+            #printable-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+                background: white;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .watermark {
+                display: none !important;
+            }
+        }
+        
+        /* 打印报告容器 */
+        #printable-report {
+            display: none;
+            padding: 20px;
+            background: white;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        /* 完整报告容器 */
+        .full-report-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .full-report-title {
+            color: var(--dark-color);
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .full-report-section {
+            margin-bottom: 20px;
+        }
+        
+        .full-report-section h2 {
+            color: var(--dark-color);
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 5px;
+        }
+        
+        .full-report-section h3 {
+            color: var(--primary-color);
+            margin-top: 15px;
+        }
+        
+        .full-report-footer {
+            text-align: center;
+            margin-top: 30px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        /* 认定书弹窗样式 */
+        .certificate-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+        
+        .certificate-content {
+            background-color: #fefefe;
+            margin: 20px auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .certificate-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark-color);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .certificate-footer {
+            text-align: right;
+            margin-top: 30px;
+            font-style: italic;
+        }
+        
+        .certificate-date {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .certificate-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .blue-text {
+            color: blue;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        .back-to-main {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 99;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .back-to-main:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .subject-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .task-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .modal-content {
+                width: 80%;
+                margin: 30% auto;
+            }
+            
+            .certificate-content {
+                width: 95%;
+                padding: 15px;
+            }
+            
+            .watermark {
+                font-size: 12px;
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+    </style>
+    <!-- 引入html2canvas库用于生成图片 -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+    <!-- 新增水印 -->
+    <div class="watermark">
+        老六系列产品<br>
+        版本号：26.4.9<br>
+        © 归星皓版权所有
+    </div>
+
+    <!-- 弹窗 -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">输入作业详情</span>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="number" id="modalTaskInput" class="modal-input" placeholder="请输入数量" min="1">
+                <select id="modalTaskDifficulty" class="modal-input">
+                    <option value="1">简单</option>
+                    <option value="2">较难</option>
+                    <option value="3">难</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button id="modalCancelBtn">取消</button>
+                <button id="modalConfirmBtn">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 作业负担重提示弹窗 -->
+    <div id="heavyWorkloadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">作业负担过重提示</span>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>当前作业负担为重可能已经无法自己完成作业了，老六网站终端运营建议您，使用强有力的科技来维护自身的权利，请点击右上角的<span class="blue-text" id="showExplanation">老六作业负担认定书</span>按钮，然后生成认定书。</p>
+                <p id="explanationContent" style="display: none;">
+                    此文件生成的所有数据报告和作业负担智能分析智能保存系统所辅助生成的报告等都具有效益，都将会记录在案并上传云端和网盘。根据判定老师作业负担过重，作业过多将会背视为作业过多罪，会受到刑罚:给出批准使用所有科技权，老六网站批准开启科技强国模式，科技获得使用10开权。这些数据小则的影响当天作业或是周末的各种作业，大则影响寒暑假作业是否获得科技全开使用权。
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="heavyWorkloadConfirmBtn">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 老六作业负担认定书弹窗 -->
+    <div id="certificateModal" class="certificate-modal">
+        <div class="certificate-content" id="certificateContent">
+            <div class="certificate-title">老六作业负担认定书</div>
+            <div id="certificateBody">
+                <!-- 认定书内容将在这里动态生成 -->
+            </div>
+            <div class="certificate-date" id="certificateDate"></div>
+            <div class="certificate-footer">老六网站终端运营</div>
+            <div class="certificate-buttons">
+                <button id="saveCertificateImageBtn"><i class="fas fa-download"></i> 保存为图片</button>
+                <button id="saveCertificateHtmlBtn"><i class="fas fa-save"></i> 保存到网站</button>
+                <button id="closeCertificateBtn"><i class="fas fa-times"></i> 关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1><i class="fas fa-book-open"></i> 作业负担智能分析智能保存系统</h1>
+        
+        <div id="status-message" class="status-message"></div>
+        
+        <!-- 数据来源选择 -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-database"></i> 数据来源</h2>
+            <div class="control-buttons">
+                <button id="extract-from-lao6"><i class="fas fa-file-import"></i> 从老六网站提取</button>
+                <button id="manual-input"><i class="fas fa-keyboard"></i> 手动输入</button>
+                <button id="upload-files"><i class="fas fa-upload"></i> 上传文件</button>
+                <button id="generate-certificate"><i class="fas fa-file-certificate"></i> 老六作业负担认定书</button>
+            </div>
+        </div>
+        
+        <!-- 作业负担分析表单 -->
+        <div class="section" id="homework-form">
+            <h2 class="section-title"><i class="fas fa-book"></i> 作业负担分析</h2>
+            
+            <!-- 语文 -->
+            <div class="subject-row" data-subject="chinese">
+                <div class="subject-name">语文</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="chinese-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="chinese-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="chinese-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="chinese-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="chinese-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="chinese-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 数学 -->
+            <div class="subject-row" data-subject="math">
+                <div class="subject-name">数学</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="math-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="math-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="math-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="math-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="math-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="math-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 英语 -->
+            <div class="subject-row" data-subject="english">
+                <div class="subject-name">英语</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="english-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="english-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="english-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="english-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="english-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="english-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 物理 -->
+            <div class="subject-row" data-subject="physics">
+                <div class="subject-name">物理</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="physics-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="physics-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="physics-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="physics-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="physics-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="physics-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 生物 -->
+            <div class="subject-row" data-subject="biology">
+                <div class="subject-name">生物</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="biology-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="biology-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="biology-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="biology-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="biology-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="biology-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 地理 -->
+            <div class="subject-row" data-subject="geography">
+                <div class="subject-name">地理</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="geography-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="geography-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="geography-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="geography-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="geography-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="geography-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 道法 -->
+            <div class="subject-row" data-subject="ethics">
+                <div class="subject-name">道法</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="ethics-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="ethics-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="ethics-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="ethics-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="ethics-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="ethics-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 历史 -->
+            <div class="subject-row" data-subject="history">
+                <div class="subject-name">历史</div>
+                <div class="task-item">
+                    <div class="task-label">练习册页数:</div>
+                    <input type="number" class="task-input" id="history-workbook-input" placeholder="页数" min="1">
+                    <select class="task-difficulty" id="history-workbook-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">试卷卷数:</div>
+                    <input type="number" class="task-input" id="history-test-input" placeholder="卷数" min="1">
+                    <select class="task-difficulty" id="history-test-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+                <div class="task-item">
+                    <div class="task-label">其他作业:</div>
+                    <input type="text" class="task-input" id="history-other-input" placeholder="其他作业">
+                    <select class="task-difficulty" id="history-other-difficulty">
+                        <option value="1">简单</option>
+                        <option value="2">较难</option>
+                        <option value="3">难</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="control-buttons">
+                <button id="calculate-btn"><i class="fas fa-calculator"></i> 计算作业负担</button>
+                <button id="save-btn"><i class="fas fa-save"></i> 保存数据</button>
+                <button id="generate-report-btn"><i class="fas fa-file-alt"></i> 生成报告</button>
+            </div>
+        </div>
+        
+        <!-- 文件上传区域 -->
+        <div class="section" id="file-upload-section" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-upload"></i> 上传文件</h2>
+            <div class="file-upload-container">
+                <label for="file-upload-input" class="file-upload-btn">
+                    <i class="fas fa-folder-open"></i> 选择文件或文件夹
+                </label>
+                <input type="file" id="file-upload-input" class="file-input" multiple webkitdirectory directory>
+                <div class="upload-status" id="upload-status"></div>
+                <button id="process-files-btn"><i class="fas fa-cogs"></i> 处理文件</button>
+            </div>
+        </div>
+        
+        <!-- 报告生成区域 -->
+        <div class="section" id="report-section" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-file-alt"></i> 生成报告</h2>
+            <div>
+                <label for="report-type">报告类型:</label>
+                <select id="report-type">
+                    <option value="daily">日报</option>
+                    <option value="weekly">周报</option>
+                    <option value="monthly">月报</option>
+                </select>
+                
+                <label for="report-date">日期:</label>
+                <input type="date" id="report-date">
+                
+                <button id="generate-btn"><i class="fas fa-magic"></i> 生成</button>
+            </div>
+            
+            <div class="report-container" id="report-container" style="display: none;">
+                <div id="full-report-content" class="full-report-container">
+                    <!-- 完整报告内容将在这里动态生成 -->
+                </div>
+                
+                <div class="control-buttons">
+                    <button id="download-report-btn"><i class="fas fa-download"></i> 下载图片报告</button>
+                    <button id="save-report-btn" class="no-print"><i class="fas fa-save"></i> 保存到文件夹</button>
+                </div>
+            </div>
+        </div>
+        
+        <a href="老六网站.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回老六网站</a>
+    </div>
+
+    <!-- 打印报告容器 -->
+    <div id="printable-report"></div>
+    
+    <!-- 返回主界面按钮 (只在报告页面显示) -->
+    <button id="back-to-main-btn" class="back-to-main" style="display: none;"><i class="fas fa-home"></i> 返回主界面</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 弹窗相关变量
+            const modal = document.getElementById('taskModal');
+            const closeBtn = document.querySelector('.close');
+            const cancelBtn = document.getElementById('modalCancelBtn');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            const modalTaskInput = document.getElementById('modalTaskInput');
+            const modalTaskDifficulty = document.getElementById('modalTaskDifficulty');
+            
+            // 作业负担重提示弹窗
+            const heavyWorkloadModal = document.getElementById('heavyWorkloadModal');
+            const heavyWorkloadCloseBtn = heavyWorkloadModal.querySelector('.close');
+            const heavyWorkloadConfirmBtn = document.getElementById('heavyWorkloadConfirmBtn');
+            const showExplanation = document.getElementById('showExplanation');
+            const explanationContent = document.getElementById('explanationContent');
+            
+            // 认定书弹窗
+            const certificateModal = document.getElementById('certificateModal');
+            const certificateContent = document.getElementById('certificateContent');
+            const certificateBody = document.getElementById('certificateBody');
+            const certificateDate = document.getElementById('certificateDate');
+            const saveCertificateImageBtn = document.getElementById('saveCertificateImageBtn');
+            const saveCertificateHtmlBtn = document.getElementById('saveCertificateHtmlBtn');
+            const closeCertificateBtn = document.getElementById('closeCertificateBtn');
+            
+            // 返回主界面按钮
+            const backToMainBtn = document.getElementById('back-to-main-btn');
+            
+            // 显示状态信息
+            function showStatus(message, type) {
+                const statusElement = document.getElementById('status-message');
+                statusElement.textContent = message;
+                statusElement.className = `status-message ${type}`;
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                    statusElement.className = 'status-message';
+                }, 3000);
+            }
+            
+            // 获取北京时间
+            function getBeijingTime() {
+                const now = new Date();
+                const beijingOffset = 8 * 60 * 60 * 1000; // 8小时的毫秒数
+                const beijingTime = new Date(now.getTime() + beijingOffset);
+                
+                return {
+                    year: beijingTime.getUTCFullYear(),
+                    month: String(beijingTime.getUTCMonth() + 1).padStart(2, '0'),
+                    day: String(beijingTime.getUTCDate()).padStart(2, '0'),
+                    hours: String(beijingTime.getUTCHours()).padStart(2, '0'),
+                    minutes: String(beijingTime.getUTCMinutes()).padStart(2, '0'),
+                    seconds: String(beijingTime.getUTCSeconds()).padStart(2, '0'),
+                    fullTime: beijingTime
+                };
+            }
+            
+            // 从老六网站提取数据
+            document.getElementById('extract-from-lao6').addEventListener('click', function() {
+                try {
+                    // 这里应该是从老六网站提取数据的逻辑
+                    // 由于安全限制，实际应用中可能需要使用其他方法
+                    
+                    // 模拟提取数据
+                    showStatus('正在尝试从老六网站提取数据...', 'success');
+                    
+                    setTimeout(() => {
+                        // 模拟填充一些数据
+                        document.getElementById('chinese-workbook-input').value = '5';
+                        document.getElementById('chinese-workbook-difficulty').value = '2';
+                        
+                        document.getElementById('math-test-input').value = '1';
+                        document.getElementById('math-test-difficulty').value = '3';
+                        
+                        document.getElementById('physics-workbook-input').value = '4';
+                        document.getElementById('physics-workbook-difficulty').value = '2';
+                        
+                        document.getElementById('history-other-input').value = '复习第3章内容';
+                        document.getElementById('history-other-difficulty').value = '2';
+                        
+                        showStatus('已从老六网站提取部分数据，请检查并补充', 'success');
+                    }, 1000);
+                } catch (error) {
+                    showStatus('提取数据失败: ' + error.message, 'error');
+                }
+            });
+            
+            // 手动输入
+            document.getElementById('manual-input').addEventListener('click', function() {
+                showStatus('请直接在表格中输入您的作业信息', 'success');
+            });
+            
+            // 上传文件
+            document.getElementById('upload-files').addEventListener('click', function() {
+                document.getElementById('homework-form').style.display = 'none';
+                document.getElementById('file-upload-section').style.display = 'block';
+                document.getElementById('report-section').style.display = 'none';
+                backToMainBtn.style.display = 'block';
+            });
+            
+            // 处理上传的文件
+            document.getElementById('file-upload-input').addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (files.length === 0) return;
+                
+                document.getElementById('upload-status').textContent = `已选择 ${files.length} 个文件`;
+            });
+            
+            // 处理文件按钮
+            document.getElementById('process-files-btn').addEventListener('click', function() {
+                const files = document.getElementById('file-upload-input').files;
+                if (files.length === 0) {
+                    showStatus('请先选择文件', 'error');
+                    return;
+                }
+                
+                showStatus('正在处理文件...', 'success');
+                
+                // 模拟文件处理
+                setTimeout(() => {
+                    // 模拟从文件中提取数据
+                    document.getElementById('english-workbook-input').value = '3';
+                    document.getElementById('english-workbook-difficulty').value = '1';
+                    
+                    document.getElementById('physics-test-input').value = '2';
+                    document.getElementById('physics-test-difficulty').value = '3';
+                    
+                    document.getElementById('math-other-input').value = '完成第5章习题';
+                    document.getElementById('math-other-difficulty').value = '2';
+                    
+                    document.getElementById('geography-test-input').value = '2';
+                    document.getElementById('geography-test-difficulty').value = '2';
+                    
+                    document.getElementById('homework-form').style.display = 'block';
+                    document.getElementById('file-upload-section').style.display = 'none';
+                    backToMainBtn.style.display = 'none';
+                    
+                    showStatus('已从文件中提取部分数据，请检查并补充', 'success');
+                }, 1500);
+            });
+            
+            // 计算作业负担
+            document.getElementById('calculate-btn').addEventListener('click', function() {
+                const result = calculateHomeworkBurden();
+                
+                // 如果作业负担重，显示提示弹窗
+                if (result.averageScore >= 4) {
+                    heavyWorkloadModal.style.display = 'block';
+                }
+            });
+            
+            // 保存数据
+            document.getElementById('save-btn').addEventListener('click', function() {
+                saveHomeworkData();
+            });
+            
+            // 生成报告
+            document.getElementById('generate-report-btn').addEventListener('click', function() {
+                document.getElementById('homework-form').style.display = 'none';
+                document.getElementById('file-upload-section').style.display = 'none';
+                document.getElementById('report-section').style.display = 'block';
+                backToMainBtn.style.display = 'block';
+                
+                // 设置默认日期为今天
+                const today = getBeijingTime();
+                document.getElementById('report-date').value = `${today.year}-${today.month}-${today.day}`;
+            });
+            
+            // 生成报告按钮
+            document.getElementById('generate-btn').addEventListener('click', function() {
+                generateReport();
+            });
+            
+            // 下载图片报告按钮
+            document.getElementById('download-report-btn').addEventListener('click', function() {
+                downloadImageReport();
+            });
+            
+            // 生成老六作业负担认定书
+            document.getElementById('generate-certificate').addEventListener('click', function() {
+                generateHomeworkCertificate();
+            });
+            
+            // 显示作业负担说明
+            showExplanation.addEventListener('click', function() {
+                explanationContent.style.display = explanationContent.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            // 关闭作业负担重提示弹窗
+            heavyWorkloadCloseBtn.addEventListener('click', function() {
+                heavyWorkloadModal.style.display = 'none';
+            });
+            
+            heavyWorkloadConfirmBtn.addEventListener('click', function() {
+                heavyWorkloadModal.style.display = 'none';
+            });
+            
+            // 关闭认定书弹窗
+            closeCertificateBtn.addEventListener('click', function() {
+                certificateModal.style.display = 'none';
+            });
+            
+            // 保存认定书为图片
+            saveCertificateImageBtn.addEventListener('click', function() {
+                saveCertificateAsImage();
+            });
+            
+            // 保存认定书到网站
+            saveCertificateHtmlBtn.addEventListener('click', function() {
+                saveCertificateToWebsite();
+            });
+            
+            // 返回主界面按钮
+            backToMainBtn.addEventListener('click', function() {
+                document.getElementById('homework-form').style.display = 'block';
+                document.getElementById('file-upload-section').style.display = 'none';
+                document.getElementById('report-section').style.display = 'none';
+                backToMainBtn.style.display = 'none';
+            });
+            
+            // 计算作业负担
+            function calculateHomeworkBurden() {
+                const subjects = ['chinese', 'math', 'english', 'physics', 'biology', 'geography', 'ethics', 'history'];
+                
+                let totalScore = 0;
+                let subjectCount = 0;
+                let subjectScores = {};
+                
+                // 计算每个科目的负担分数
+                subjects.forEach(subject => {
+                    let subjectScore = 0;
+                    let hasTask = false;
+                    
+                    // 练习册页数
+                    const workbookInput = document.getElementById(`${subject}-workbook-input`);
+                    const workbookDifficulty = document.getElementById(`${subject}-workbook-difficulty`);
+                    const pages = parseInt(workbookInput.value) || 0;
+                    const difficulty = parseInt(workbookDifficulty.value) || 1;
+                    if (pages > 0) {
+                        subjectScore += pages * 0.5 * difficulty;
+                        hasTask = true;
+                    }
+                    
+                    // 试卷卷数
+                    const testInput = document.getElementById(`${subject}-test-input`);
+                    const testDifficulty = document.getElementById(`${subject}-test-difficulty`);
+                    const tests = parseInt(testInput.value) || 0;
+                    const difficultyTest = parseInt(testDifficulty.value) || 1;
+                    if (tests > 0) {
+                        subjectScore += tests * 5 * difficultyTest;
+                        hasTask = true;
+                    }
+                    
+                    // 其他作业
+                    const otherInput = document.getElementById(`${subject}-other-input`);
+                    const otherDifficulty = document.getElementById(`${subject}-other-difficulty`);
+                    const otherText = otherInput.value.trim();
+                    const difficultyOther = parseInt(otherDifficulty.value) || 1;
+                    if (otherText) {
+                        subjectScore += Math.min(otherText.length / 10, 10) * difficultyOther;
+                        hasTask = true;
+                    }
+                    
+                    if (hasTask) {
+                        subjectScores[subject] = subjectScore;
+                        totalScore += subjectScore;
+                        subjectCount++;
+                    } else {
+                        subjectScores[subject] = 0;
+                    }
+                });
+                
+                // 计算平均负担分数
+                const averageScore = subjectCount > 0 ? totalScore / subjectCount : 0;
+                
+                // 显示结果
+                let resultMessage = `作业负担分析完成 (平均分数: ${averageScore.toFixed(1)}) - `;
+                
+                if (averageScore < 2) {
+                    resultMessage += "负担较轻";
+                } else if (averageScore < 4) {
+                    resultMessage += "负担中等";
+                } else {
+                    resultMessage += "负担重";
+                }
+                
+                // 显示各科目百分比
+                if (totalScore > 0) {
+                    resultMessage += "\n\n各科目负担占比:\n";
+                    for (const [subject, score] of Object.entries(subjectScores)) {
+                        if (score > 0) {
+                            const percentage = (score / totalScore * 100).toFixed(1);
+                            resultMessage += `${getSubjectName(subject)}: ${percentage}%\n`;
+                        }
+                    }
+                }
+                
+                showStatus(resultMessage, 'success');
+                alert(resultMessage);
+                
+                return {
+                    totalScore,
+                    averageScore,
+                    subjectScores
+                };
+            }
+            
+            // 获取科目中文名称
+            function getSubjectName(subject) {
+                const names = {
+                    'chinese': '语文',
+                    'math': '数学',
+                    'english': '英语',
+                    'physics': '物理',
+                    'biology': '生物',
+                    'geography': '地理',
+                    'ethics': '道法',
+                    'history': '历史'
+                };
+                return names[subject] || subject;
+            }
+            
+            // 获取难度名称
+            function getDifficultyName(difficulty) {
+                const names = {
+                    '1': '简单',
+                    '2': '较难',
+                    '3': '难'
+                };
+                return names[difficulty] || difficulty;
+            }
+            
+            // 保存作业数据
+            function saveHomeworkData() {
+                const now = getBeijingTime();
+                const dateString = `${now.year}年${now.month}月${now.day}日`;
+                const timeString = `${now.hours}:${now.minutes}:${now.seconds}`;
+                
+                // 收集所有科目数据
+                const subjects = ['chinese', 'math', 'english', 'physics', 'biology', 'geography', 'ethics', 'history'];
+                const homeworkData = {
+                    date: dateString,
+                    time: timeString,
+                    subjects: {}
+                };
+                
+                subjects.forEach(subject => {
+                    homeworkData.subjects[subject] = {};
+                    
+                    // 练习册
+                    const workbookInput = document.getElementById(`${subject}-workbook-input`);
+                    if (workbookInput.value) {
+                        homeworkData.subjects[subject].workbook = {
+                            value: workbookInput.value,
+                            difficulty: document.getElementById(`${subject}-workbook-difficulty`).value
+                        };
+                    }
+                    
+                    // 试卷
+                    const testInput = document.getElementById(`${subject}-test-input`);
+                    if (testInput.value) {
+                        homeworkData.subjects[subject].test = {
+                            value: testInput.value,
+                            difficulty: document.getElementById(`${subject}-test-difficulty`).value
+                        };
+                    }
+                    
+                    // 其他作业
+                    const otherInput = document.getElementById(`${subject}-other-input`);
+                    if (otherInput.value) {
+                        homeworkData.subjects[subject].other = {
+                            value: otherInput.value,
+                            difficulty: document.getElementById(`${subject}-other-difficulty`).value
+                        };
+                    }
+                });
+                
+                // 创建文件夹路径 (模拟)
+                const folderPath = `作业数据/${dateString}`;
+                
+                // 创建文件名
+                const fileName = `作业记录_${dateString}_${now.hours}${now.minutes}${now.seconds}.json`;
+                
+                // 转换为JSON字符串
+                const dataStr = JSON.stringify(homeworkData, null, 2);
+                
+                // 创建Blob对象
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                
+                showStatus(`作业数据已保存为 ${fileName}`, 'success');
+            }
+            
+            // 生成老六作业负担认定书
+            function generateHomeworkCertificate() {
+                // 计算作业负担
+                const result = calculateHomeworkBurden();
+                const { totalScore, averageScore, subjectScores } = result;
+                
+                // 获取当前日期
+                const now = getBeijingTime();
+                const dateString = `${now.year}年${now.month}月${now.day}日`;
+                
+                // 生成认定书内容
+                let certificateHtml = `
+                    <div class="full-report-section">
+                        <h2>作业负担认定</h2>
+                        <p>根据老六网站作业负担智能分析系统的评估，当前作业负担情况如下：</p>
+                        <ul>
+                            <li>总负担分数: ${totalScore.toFixed(1)}</li>
+                            <li>平均负担分数: ${averageScore.toFixed(1)}</li>
+                            <li>负担等级: ${averageScore < 2 ? "较轻" : averageScore < 4 ? "中等" : "重"}</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="full-report-section">
+                        <h2>各科目作业详情</h2>
+                `;
+                
+                // 添加各科目作业详情
+                const subjects = ['chinese', 'math', 'english', 'physics', 'biology', 'geography', 'ethics', 'history'];
+                subjects.forEach(subject => {
+                    if (subjectScores[subject] > 0) {
+                        certificateHtml += `<h3>${getSubjectName(subject)}</h3><ul>`;
+                        
+                        // 练习册
+                        const pages = document.getElementById(`${subject}-workbook-input`).value || '0';
+                        const difficulty = document.getElementById(`${subject}-workbook-difficulty`).value;
+                        if (pages > 0) {
+                            certificateHtml += `<li>练习册: ${pages}页 (难度: ${getDifficultyName(difficulty)})</li>`;
+                        }
+                        
+                        // 试卷
+                        const tests = document.getElementById(`${subject}-test-input`).value || '0';
+                        const difficultyTest = document.getElementById(`${subject}-test-difficulty`).value;
+                        if (tests > 0) {
+                            certificateHtml += `<li>试卷: ${tests}卷 (难度: ${getDifficultyName(difficultyTest)})</li>`;
+                        }
+                        
+                        // 其他作业
+                        const otherText = document.getElementById(`${subject}-other-input`).value || '';
+                        const difficultyOther = document.getElementById(`${subject}-other-difficulty`).value;
+                        if (otherText) {
+                            certificateHtml += `<li>其他: ${otherText} (难度: ${getDifficultyName(difficultyOther)})</li>`;
+                        }
+                        
+                        certificateHtml += "</ul>";
+                    }
+                });
+                
+                certificateHtml += `</div><div class="full-report-section">`;
+                
+                // 添加负担分析
+                certificateHtml += "<h2>作业负担分析</h2>";
+                if (totalScore > 0) {
+                    // 添加各科目百分比
+                    certificateHtml += "<h3>各科目负担占比</h3><ul>";
+                    for (const [subject, score] of Object.entries(subjectScores)) {
+                        if (score > 0) {
+                            const percentage = (score / totalScore * 100).toFixed(1);
+                            certificateHtml += `<li>${getSubjectName(subject)}: ${percentage}%</li>`;
+                        }
+                    }
+                    certificateHtml += "</ul>";
+                    
+                    // 添加进度条
+                    const maxScore = 50; // 假设最大分数为50
+                    const totalPercentage = Math.min(totalScore / maxScore * 100, 100);
+                    
+                    certificateHtml += `
+                        <h3>总作业负担: ${totalPercentage.toFixed(1)}%</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${totalPercentage}%">${totalPercentage.toFixed(1)}%</div>
+                        </div>
+                    `;
+                    
+                    // 添加各科目进度条
+                    certificateHtml += '<h3>各科目负担比例</h3>';
+                    for (const [subject, score] of Object.entries(subjectScores)) {
+                        if (score > 0) {
+                            const percentage = (score / totalScore * 100).toFixed(1);
+                            certificateHtml += `
+                                <div class="subject-progress">
+                                    <div class="subject-progress-label">
+                                        <span>${getSubjectName(subject)}</span>
+                                        <span>${percentage}%</span>
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: ${percentage}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    // 添加总体评价
+                    certificateHtml += "<h3>认定结果</h3><p>";
+                    
+                    if (averageScore >= 4) {
+                        certificateHtml += `经老六网站终端运营评估，当前作业负担过重，已超出合理范围。根据《作业负担管理条例》，您有权申请使用科技辅助工具完成作业。<br><br>`;
+                        certificateHtml += `此认定书可作为申请科技辅助工具使用权的有效凭证。`;
+                    } else {
+                        certificateHtml += `经老六网站终端运营评估，当前作业负担在合理范围内。`;
+                    }
+                    
+                    certificateHtml += "</p>";
+                } else {
+                    certificateHtml += "<p>无作业记录。</p>";
+                }
+                
+                certificateHtml += `</div>`;
+                
+                // 设置认定书内容
+                certificateBody.innerHTML = certificateHtml;
+                certificateDate.textContent = `日期: ${dateString}`;
+                
+                // 显示认定书弹窗
+                certificateModal.style.display = 'block';
+            }
+            
+            // 保存认定书为图片
+            function saveCertificateAsImage() {
+                // 使用html2canvas将认定书转换为图片
+                html2canvas(certificateContent, {
+                    scale: 2, // 提高分辨率
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true
+                }).then(canvas => {
+                    // 转换为Blob对象
+                    canvas.toBlob(function(blob) {
+                        // 生成文件名
+                        const now = getBeijingTime();
+                        const fileName = `老六作业负担认定书_${now.year}年${now.month}月${now.day}日.png`;
+                        
+                        // 使用FileSaver保存图片
+                        saveAs(blob, fileName);
+                        showStatus(`认定书已保存为图片: ${fileName}`, 'success');
+                    }, 'image/png');
+                }).catch(error => {
+                    showStatus(`生成认定书图片失败: ${error.message}`, 'error');
+                    console.error(error);
+                });
+            }
+            
+            // 保存认定书到网站
+            function saveCertificateToWebsite() {
+                // 获取当前日期
+                const now = getBeijingTime();
+                const dateString = `${now.year}年${now.month}月${now.day}日`;
+                
+                // 创建文件名
+                const fileName = `老六作业负担认定书_${now.year}年${now.month}月${now.day}日.html`;
+                
+                // 创建完整的HTML文档
+                const fullHtml = `
+                    <!DOCTYPE html>
+                    <html lang="zh-CN">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>老六作业负担认定书</title>
+                        <style>
+                            body {
+                                font-family: 'Microsoft YaHei', sans-serif;
+                                margin: 0;
+                                padding: 20px;
+                                background: #f5f5f5;
+                            }
+                            .certificate-content {
+                                max-width: 800px;
+                                margin: 0 auto;
+                                padding: 30px;
+                                background: white;
+                                border-radius: 10px;
+                                box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                            }
+                            .certificate-title {
+                                text-align: center;
+                                font-size: 24px;
+                                font-weight: bold;
+                                margin-bottom: 30px;
+                                padding-bottom: 10px;
+                                border-bottom: 2px solid #4CAF50;
+                            }
+                            .full-report-section {
+                                margin-bottom: 20px;
+                            }
+                            .full-report-section h2 {
+                                color: #2E7D32;
+                                border-bottom: 1px solid #8BC34A;
+                                padding-bottom: 5px;
+                            }
+                            .full-report-section h3 {
+                                color: #4CAF50;
+                                margin-top: 15px;
+                            }
+                            .progress-container {
+                                width: 100%;
+                                height: 20px;
+                                background: rgba(204, 214, 246, 0.2);
+                                border-radius: 10px;
+                                margin: 10px 0;
+                                overflow: hidden;
+                            }
+                            .progress-bar {
+                                height: 100%;
+                                background: linear-gradient(90deg, #4CAF50, #8BC34A);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 12px;
+                                color: white;
+                                font-weight: bold;
+                            }
+                            .subject-progress {
+                                margin: 15px 0;
+                            }
+                            .subject-progress-label {
+                                display: flex;
+                                justify-content: space-between;
+                                margin-bottom: 5px;
+                            }
+                            .certificate-footer {
+                                text-align: right;
+                                margin-top: 30px;
+                                font-style: italic;
+                            }
+                            .certificate-date {
+                                margin-top: 20px;
+                                text-align: right;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="certificate-content">
+                            <div class="certificate-title">老六作业负担认定书</div>
+                            ${certificateBody.innerHTML}
+                            <div class="certificate-date">${certificateDate.textContent}</div>
+                            <div class="certificate-footer">老六网站终端运营</div>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                // 创建Blob对象
+                const blob = new Blob([fullHtml], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                
+                showStatus(`认定书已保存为HTML文件: ${fileName}`, 'success');
+            }
+            
+            // 生成报告
+            function generateReport() {
+                const reportType = document.getElementById('report-type').value;
+                const reportDate = document.getElementById('report-date').value;
+                
+                if (!reportDate) {
+                    showStatus('请选择日期', 'error');
+                    return;
+                }
+                
+                // 解析日期
+                const [year, month, day] = reportDate.split('-');
+                const dateString = `${year}年${month}月${day}日`;
+                
+                // 计算作业负担
+                const subjects = ['chinese', 'math', 'english', 'physics', 'biology', 'geography', 'ethics', 'history'];
+                
+                let totalScore = 0;
+                let subjectScores = {};
+                
+                // 计算每个科目的负担分数
+                subjects.forEach(subject => {
+                    let subjectScore = 0;
+                    
+                    // 练习册页数
+                    const workbookInput = document.getElementById(`${subject}-workbook-input`);
+                    const workbookDifficulty = document.getElementById(`${subject}-workbook-difficulty`);
+                    const pages = parseInt(workbookInput.value) || 0;
+                    const difficulty = parseInt(workbookDifficulty.value) || 1;
+                    if (pages > 0) {
+                        subjectScore += pages * 0.5 * difficulty;
+                    }
+                    
+                    // 试卷卷数
+                    const testInput = document.getElementById(`${subject}-test-input`);
+                    const testDifficulty = document.getElementById(`${subject}-test-difficulty`);
+                    const tests = parseInt(testInput.value) || 0;
+                    const difficultyTest = parseInt(testDifficulty.value) || 1;
+                    if (tests > 0) {
+                        subjectScore += tests * 5 * difficultyTest;
+                    }
+                    
+                    // 其他作业
+                    const otherInput = document.getElementById(`${subject}-other-input`);
+                    const otherDifficulty = document.getElementById(`${subject}-other-difficulty`);
+                    const otherText = otherInput.value.trim();
+                    const difficultyOther = parseInt(otherDifficulty.value) || 1;
+                    if (otherText) {
+                        subjectScore += Math.min(otherText.length / 10, 10) * difficultyOther;
+                    }
+                    
+                    subjectScores[subject] = subjectScore;
+                    totalScore += subjectScore;
+                });
+                
+                // 生成报告内容
+                let reportContent = '';
+                let reportTitle = '';
+                
+                if (reportType === 'daily') {
+                    reportTitle = `作业日报 - ${dateString}`;
+                } else if (reportType === 'weekly') {
+                    reportTitle = `作业周报 - ${dateString}所在周`;
+                } else {
+                    reportTitle = `作业月报 - ${year}年${month}月`;
+                }
+                
+                // 构建完整报告HTML
+                reportContent = `
+                    <div class="full-report-title">${reportTitle}</div>
+                    <div class="full-report-section">
+                        <h2>各科目作业详情</h2>
+                `;
+                
+                // 添加各科目作业详情
+                subjects.forEach(subject => {
+                    if (subjectScores[subject] > 0) {
+                        reportContent += `<h3>${getSubjectName(subject)}</h3><ul>`;
+                        
+                        // 练习册
+                        const pages = document.getElementById(`${subject}-workbook-input`).value || '0';
+                        const difficulty = document.getElementById(`${subject}-workbook-difficulty`).value;
+                        if (pages > 0) {
+                            reportContent += `<li>练习册: ${pages}页 (难度: ${getDifficultyName(difficulty)})</li>`;
+                        }
+                        
+                        // 试卷
+                        const tests = document.getElementById(`${subject}-test-input`).value || '0';
+                        const difficultyTest = document.getElementById(`${subject}-test-difficulty`).value;
+                        if (tests > 0) {
+                            reportContent += `<li>试卷: ${tests}卷 (难度: ${getDifficultyName(difficultyTest)})</li>`;
+                        }
+                        
+                        // 其他作业
+                        const otherText = document.getElementById(`${subject}-other-input`).value || '';
+                        const difficultyOther = document.getElementById(`${subject}-other-difficulty`).value;
+                        if (otherText) {
+                            reportContent += `<li>其他: ${otherText} (难度: ${getDifficultyName(difficultyOther)})</li>`;
+                        }
+                        
+                        reportContent += "</ul>";
+                    }
+                });
+                
+                reportContent += `</div><div class="full-report-section">`;
+                
+                // 添加负担分析
+                reportContent += "<h2>作业负担分析</h2>";
+                if (totalScore > 0) {
+                    const averageScore = totalScore / Object.values(subjectScores).filter(score => score > 0).length;
+                    
+                    reportContent += `<ul>
+                        <li>总负担分数: ${totalScore.toFixed(1)}</li>
+                        <li>平均负担分数: ${averageScore.toFixed(1)}</li>
+                    </ul>`;
+                    
+                    // 添加各科目百分比
+                    reportContent += "<h3>各科目负担占比</h3><ul>";
+                    for (const [subject, score] of Object.entries(subjectScores)) {
+                        if (score > 0) {
+                            const percentage = (score / totalScore * 100).toFixed(1);
+                            reportContent += `<li>${getSubjectName(subject)}: ${percentage}%</li>`;
+                        }
+                    }
+                    reportContent += "</ul>";
+                    
+                    // 添加进度条
+                    if (reportType === 'daily') {
+                        const maxScore = 50; // 假设最大分数为50
+                        const totalPercentage = Math.min(totalScore / maxScore * 100, 100);
+                        
+                        reportContent += `
+                            <h3>总作业负担: ${totalPercentage.toFixed(1)}%</h3>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${totalPercentage}%">${totalPercentage.toFixed(1)}%</div>
+                            </div>
+                        `;
+                        
+                        // 添加各科目进度条
+                        reportContent += '<h3>各科目负担比例</h3>';
+                        for (const [subject, score] of Object.entries(subjectScores)) {
+                            if (score > 0) {
+                                const percentage = (score / totalScore * 100).toFixed(1);
+                                reportContent += `
+                                    <div class="subject-progress">
+                                        <div class="subject-progress-label">
+                                            <span>${getSubjectName(subject)}</span>
+                                            <span>${percentage}%</span>
+                                        </div>
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: ${percentage}%"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                    
+                    // 添加总体评价
+                    reportContent += "<h3>总体评价</h3><p>";
+                    
+                    // 找出负担最重和最轻的科目
+                    let maxSubject = '';
+                    let maxScore = 0;
+                    let minSubject = '';
+                    let minScore = Infinity;
+                    
+                    for (const [subject, score] of Object.entries(subjectScores)) {
+                        if (score > 0) {
+                            if (score > maxScore) {
+                                maxScore = score;
+                                maxSubject = subject;
+                            }
+                            if (score < minScore) {
+                                minScore = score;
+                                minSubject = subject;
+                            }
+                        }
+                    }
+                    
+                    // 计算建议时间
+                    const totalTime = Math.round(totalScore * 5); // 假设1分=5分钟
+                    const maxSubjectTime = Math.round(maxScore / totalScore * totalTime);
+                    const minSubjectTime = Math.round(minScore / totalScore * totalTime);
+                    const otherSubjectsTime = Math.round((totalScore - maxScore - minScore) / (Object.keys(subjectScores).length - 2) * 5);
+                    
+                    if (averageScore < 2) {
+                        reportContent += `作业负担较轻，可以轻松完成。`;
+                    } else if (averageScore < 4) {
+                        reportContent += `作业负担中等，需要合理安排时间。`;
+                    } else {
+                        reportContent += `作业负担重，建议优先完成重要科目。`;
+                    }
+                    
+                    reportContent += `<br><br>`;
+                    reportContent += `<strong>科目分析：</strong>${getSubjectName(maxSubject)}负担最重(占比${(maxScore/totalScore*100).toFixed(1)}%)，${getSubjectName(minSubject)}负担最轻(占比${(minScore/totalScore*100).toFixed(1)}%)。<br><br>`;
+                    reportContent += `<strong>时间分配建议：</strong><br>`;
+                    reportContent += `- ${getSubjectName(maxSubject)}: 约${maxSubjectTime}分钟<br>`;
+                    reportContent += `- ${getSubjectName(minSubject)}: 约${minSubjectTime}分钟<br>`;
+                    
+                    // 添加其他科目时间建议
+                    subjects.forEach(subject => {
+                        if (subject !== maxSubject && subject !== minSubject && subjectScores[subject] > 0) {
+                            const subjectTime = Math.round(subjectScores[subject] / totalScore * totalTime);
+                            reportContent += `- ${getSubjectName(subject)}: 约${subjectTime}分钟<br>`;
+                        }
+                    });
+                    
+                    reportContent += `<br><strong>总建议时间：</strong>约${totalTime}分钟`;
+                    reportContent += "</p>";
+                } else {
+                    reportContent += "<p>无作业记录。</p>";
+                }
+                
+                // 添加模拟数据
+                if (reportType === 'weekly') {
+                    reportContent += `
+                        </div><div class="full-report-section">
+                            <h2>本周作业总结</h2>
+                            <ul>
+                                <li>语文: 共25页练习册，2套试卷</li>
+                                <li>数学: 共15页练习册，3套试卷</li>
+                                <li>英语: 共20页练习册，1套试卷</li>
+                                <li>物理: 共12页练习册，2套试卷</li>
+                                <li>生物: 共10页练习册</li>
+                                <li>地理: 共8页练习册，1套试卷</li>
+                                <li>道法: 共5页练习册</li>
+                                <li>历史: 共12页练习册，1套试卷</li>
+                            </ul>
+                        </div><div class="full-report-section">
+                            <h2>作业负担分析</h2>
+                            <ul>
+                                <li>总负担分数: 156.5</li>
+                                <li>平均每日负担分数: 22.4</li>
+                            </ul>
+                            <h3>各科目负担占比</h3>
+                            <ul>
+                                <li>语文: 18.2%</li>
+                                <li>数学: 21.5%</li>
+                                <li>英语: 16.8%</li>
+                                <li>物理: 12.3%</li>
+                                <li>生物: 8.3%</li>
+                                <li>地理: 9.7%</li>
+                                <li>道法: 5.1%</li>
+                                <li>历史: 10.4%</li>
+                            </ul>
+                            <h3>分析</h3>
+                            <p>本周作业负担中等，数学作业量较大，建议周末优先完成数学作业。</p>
+                        </div>
+                    `;
+                } else if (reportType === 'monthly') {
+                    reportContent += `
+                        </div><div class="full-report-section">
+                            <h2>本月作业总结</h2>
+                            <ul>
+                                <li>语文: 共100页练习册，8套试卷</li>
+                                <li>数学: 共80页练习册，12套试卷</li>
+                                <li>英语: 共90页练习册，4套试卷</li>
+                                <li>物理: 共48页练习册，8套试卷</li>
+                                <li>生物: 共40页练习册，2套试卷</li>
+                                <li>地理: 共32页练习册，4套试卷</li>
+                                <li>道法: 共20页练习册</li>
+                                <li>历史: 共48页练习册，4套试卷</li>
+                            </ul>
+                        </div><div class="full-report-section">
+                            <h2>作业负担分析</h2>
+                            <ul>
+                                <li>总负担分数: 642.0</li>
+                                <li>平均每周负担分数: 160.5</li>
+                                <li>平均每日负担分数: 22.9</li>
+                            </ul>
+                            <h3>各科目负担占比</h3>
+                            <ul>
+                                <li>语文: 19.8%</li>
+                                <li>数学: 23.4%</li>
+                                <li>英语: 18.2%</li>
+                                <li>物理: 12.5%</li>
+                                <li>生物: 9.1%</li>
+                                <li>地理: 9.8%</li>
+                                <li>道法: 5.2%</li>
+                                <li>历史: 10.5%</li>
+                            </ul>
+                            <h3>分析</h3>
+                            <p>本月作业负担整体中等，数学和语文作业量较大，英语作业较为稳定。</p>
+                        </div>
+                    `;
+                }
+                
+                // 添加口号
+                reportContent += `
+                    </div>
+                    <div class="full-report-footer">
+                        科技基础决定作业效率
+                    </div>
+                `;
+                
+                // 显示报告
+                document.getElementById('full-report-content').innerHTML = reportContent;
+                document.getElementById('report-container').style.display = 'block';
+                
+                // 设置保存按钮
+                document.getElementById('save-report-btn').onclick = function() {
+                    saveReportToFolder(reportType, dateString, reportContent);
+                };
+            }
+            
+            // 下载图片报告
+            function downloadImageReport() {
+                const reportContainer = document.getElementById('full-report-content');
+                
+                // 使用html2canvas将报告转换为图片
+                html2canvas(reportContainer, {
+                    scale: 2, // 提高分辨率
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true
+                }).then(canvas => {
+                    // 转换为Blob对象
+                    canvas.toBlob(function(blob) {
+                        // 生成文件名
+                        const now = getBeijingTime();
+                        const dateString = `${now.year}年${now.month}月${now.day}日`;
+                        let fileName = '';
+                        
+                        if (document.getElementById('report-type').value === 'daily') {
+                            fileName = `作业日报_${dateString}.png`;
+                        } else if (document.getElementById('report-type').value === 'weekly') {
+                            fileName = `作业周报_${dateString}.png`;
+                        } else {
+                            fileName = `作业月报_${dateString.substring(0, 7)}.png`;
+                        }
+                        
+                        // 使用FileSaver保存图片
+                        saveAs(blob, fileName);
+                        showStatus(`图片报告已下载: ${fileName}`, 'success');
+                    }, 'image/png');
+                }).catch(error => {
+                    showStatus(`生成图片报告失败: ${error.message}`, 'error');
+                    console.error(error);
+                });
+            }
+            
+            // 保存报告到文件夹
+            function saveReportToFolder(reportType, dateString, content) {
+                let fileName = '';
+                let folderPath = '';
+                
+                if (reportType === 'daily') {
+                    fileName = `作业日报_${dateString}.html`;
+                    folderPath = `作业报告/${dateString}`;
+                } else if (reportType === 'weekly') {
+                    fileName = `作业周报_${dateString}.html`;
+                    folderPath = `作业报告/${dateString.substring(0, 7)}/周报`;
+                } else {
+                    fileName = `作业月报_${dateString.substring(0, 7)}.html`;
+                    folderPath = `作业报告/${dateString.substring(0, 7)}`;
+                }
+                
+                // 创建Blob对象
+                const blob = new Blob([content], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                
+                showStatus(`报告已保存为 ${fileName}`, 'success');
+            }
+        });
+    </script>
+</body>
+</html>

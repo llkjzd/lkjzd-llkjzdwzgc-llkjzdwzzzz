@@ -1,0 +1,4022 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老六网站</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #00f2fe;
+            --secondary-color: #4facfe;
+            --accent-color: #00d2ff;
+            --dark-color: #0a192f;
+            --light-color: #ccd6f6;
+            --success-color: #00ff9d;
+            --warning-color: #ff9a00;
+            --danger-color: #ff3860;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--dark-color) 0%, #020c1b 100%);
+            color: var(--light-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(10, 25, 47, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 242, 254, 0.1);
+            position: relative;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            margin: 10px auto 0;
+            border-radius: 3px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(10, 25, 47, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 242, 254, 0.2);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+        
+        .section:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.3);
+            padding-bottom: 10px;
+            margin-top: 0;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .time-display {
+            font-size: 2.5em;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--light-color);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+        }
+        
+        button:hover::before {
+            transform: translateX(100%);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        input, select {
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            margin-right: 10px;
+            background: rgba(10, 25, 47, 0.7);
+            color: var(--light-color);
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.3), inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        input::placeholder {
+            color: rgba(204, 214, 246, 0.5);
+        }
+        
+        .tech-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .tech-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .tech-button:hover {
+            background: linear-gradient(135deg, #5a6fd1, #6a4198);
+        }
+        
+        #tomato-timer-display, #countdown-display, #stopwatch-display, #schedule-display, #subject-countdown-display {
+            font-size: 3em;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--light-color);
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+        }
+        
+        .active-timer {
+            background: rgba(0, 242, 254, 0.05);
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+        
+        #status-message {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .success {
+            background-color: rgba(0, 255, 157, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(0, 255, 157, 0.3);
+        }
+        
+        .error {
+            background-color: rgba(255, 56, 96, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(255, 56, 96, 0.3);
+        }
+        
+        /* 科目倒计时样式 */
+        .subject-countdown-info {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--light-color);
+        }
+        
+        .subject-countdown-name {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .subject-countdown-time {
+            color: var(--accent-color);
+        }
+        
+        /* 科目倒计时植入按钮样式 */
+        .insert-btn {
+            background: linear-gradient(135deg, var(--warning-color), #ff6b00);
+        }
+        
+        .insert-btn:hover {
+            background: linear-gradient(135deg, #e68a00, #e05e00);
+        }
+        
+        /* 排序按钮样式 */
+        .sort-btn {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+        }
+        
+        .sort-btn:hover {
+            background: linear-gradient(135deg, #8c1fa0, #5e35b1);
+        }
+        
+        /* 删除按钮样式 */
+        .delete-btn {
+            background: linear-gradient(135deg, var(--danger-color), #ff0d6e);
+        }
+        
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #e63256, #e00b63);
+        }
+        
+        /* 工作日/休息日样式 */
+        .workday-info {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--light-color);
+        }
+        
+        .workday {
+            color: var(--success-color);
+        }
+        
+        .techday {
+            color: var(--warning-color);
+        }
+        
+        .holiday {
+            color: var(--accent-color);
+        }
+        
+        /* 工作状态样式 */
+        .work-status {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: var(--light-color);
+        }
+        
+        .status-rest {
+            color: var(--accent-color);
+        }
+        
+        .status-working {
+            color: var(--success-color);
+        }
+        
+        .status-none {
+            color: rgba(204, 214, 246, 0.5);
+        }
+        
+        /* 开发者模式链接 */
+        .developer-link {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(204, 214, 246, 0.7);
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+        }
+        
+        .developer-link:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(0, 242, 254, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* 网站作用按钮样式 */
+        .website-purpose-link {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(204, 214, 246, 0.7);
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            background: rgba(0, 242, 254, 0.05);
+            margin-right: 10px;
+        }
+        
+        .website-purpose-link:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            background: rgba(0, 242, 254, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* 开发者模式面板 */
+        .developer-panel {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(10, 25, 47, 0.8);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .developer-panel h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.3);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .developer-panel h3 i {
+            margin-right: 10px;
+        }
+        
+        /* 设置项样式 */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0, 242, 254, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.1);
+            transition: all 0.3s;
+        }
+        
+        .setting-item:hover {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(204, 214, 246, 0.2);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--light-color);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .schedule-date-selector {
+            margin-bottom: 10px;
+        }
+        
+        /* 科技强国栏目样式 */
+        #tech-section {
+            display: none;
+        }
+        
+        /* DeepSeek常用语言样式 */
+        #deepseek-section {
+            display: none;
+        }
+        
+        .deepseek-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.1);
+            transition: all 0.3s;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .deepseek-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .deepseek-item:hover {
+            background: rgba(0, 242, 254, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .deepseek-copy-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-color);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0, 242, 254, 0.2);
+        }
+        
+        .deepseek-copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .add-deepseek-item {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .add-deepseek-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-color);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .add-deepseek-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+        }
+        
+        /* 科目时间保存按钮样式 */
+        .subject-buttons {
+            display: none;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .subject-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, #0a192f, #020c1b);
+            padding: 30px;
+            border-radius: 15px;
+            width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.2);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            animation: modalFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .modal-title i {
+            margin-right: 10px;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 15px 0;
+            box-sizing: border-box;
+            background: rgba(10, 25, 47, 0.7);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 8px;
+            color: var(--light-color);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s;
+        }
+        
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 排序弹窗样式 */
+        #sort-modal .modal-content {
+            width: 80%;
+            max-width: 600px;
+        }
+        
+        .sortable-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        
+        .sortable-item {
+            padding: 15px;
+            margin-bottom: 8px;
+            background: rgba(10, 25, 47, 0.7);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .sortable-item:hover {
+            background: rgba(0, 242, 254, 0.1);
+            transform: translateX(5px);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+        
+        .subject-time {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* 粒子背景效果 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(0, 242, 254, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        /* 全屏图片查看器样式 */
+        .fullscreen-image-viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .fullscreen-image-container {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        
+        .fullscreen-image {
+            max-width: 100%;
+            max-height: 90vh;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .close-fullscreen-image {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .close-fullscreen-image:hover {
+            background: rgba(255, 0, 0, 0.7);
+            transform: scale(1.1);
+        }
+        
+        /* 版本信息样式 */
+        .version-info {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            color: rgba(204, 214, 246, 0.7);
+            font-size: 12px;
+            z-index: 101;
+            text-align: right;
+        }
+        
+        .version-info span {
+            display: block;
+            margin-top: 5px;
+        }
+        
+        /* 音乐播放器样式 */
+        .music-player {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .music-info {
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+        
+        .music-title {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .music-progress {
+            width: 100%;
+            height: 5px;
+            background: rgba(204, 214, 246, 0.2);
+            margin-top: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .music-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+        
+        .music-time {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: rgba(204, 214, 246, 0.7);
+        }
+        
+        .music-volume {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .music-volume input {
+            width: 100px;
+            margin-left: 10px;
+        }
+        
+        .playlist {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .playlist-item {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .playlist-item:hover {
+            background: rgba(0, 242, 254, 0.1);
+        }
+        
+        .playlist-item.active {
+            background: rgba(0, 242, 254, 0.2);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        /* 视频播放器样式 */
+        .video-player {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto 0;
+            display: none;
+        }
+        
+        .video-player video {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+        /* 文件上传样式 */
+        .file-upload-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 8px;
+            border: 1px dashed rgba(0, 242, 254, 0.3);
+        }
+        
+        .file-upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-color);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .upload-status {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        
+        /* 云端储存样式 */
+        .cloud-storage-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+        
+        .cloud-storage-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .cloud-storage-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .cloud-storage-item {
+            position: relative;
+            cursor: pointer;
+            border-radius: 6px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .cloud-storage-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .cloud-storage-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+        
+        .cloud-storage-code {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        
+        /* 唯一网址样式 */
+        .unique-url-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            text-align: center;
+        }
+        
+        .unique-url {
+            font-family: 'Courier New', monospace;
+            color: var(--primary-color);
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        
+        .copy-url-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .copy-url-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        /* 遥遥领先样式 */
+        #yaoyao-modal .modal-content {
+               width: 350px;
+               text-align: center;
+        }
+
+        #yaoyao-modal .modal-title {
+               color: #ff0000;
+               justify-content: center;
+        }
+        
+        /* 作业负担分析样式 */
+        .homework-analysis {
+            margin-top: 20px;
+        }
+        
+        .subject-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(10, 25, 47, 0.5);
+            border-radius: 8px;
+        }
+        
+        .subject-name {
+            width: 80px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+        
+        .task-label {
+            margin-right: 10px;
+            width: 80px;
+        }
+        
+        .task-toggle {
+            margin-right: 10px;
+        }
+        
+        .task-input {
+            width: 80px;
+            display: none;
+        }
+        
+        .task-difficulty {
+            margin-left: 10px;
+            display: none;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(204, 214, 246, 0.2);
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        
+        .result-face {
+            font-size: 3em;
+            margin: 10px 0;
+        }
+        
+        .green-face {
+            color: #00ff9d;
+        }
+        
+        .yellow-face {
+            color: #ff9a00;
+        }
+        
+        .red-face {
+            color: #ff3860;
+        }
+        
+        .tech-mode-btn {
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            margin-top: 20px;
+        }
+        
+        .meme-btn {
+            background: linear-gradient(135deg, #ff9a00, #ff6b00);
+            margin-top: 20px;
+            margin-left: 10px;
+        }
+        
+        /* 科技模式样式 */
+        body.tech-mode {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+        }
+        
+        body.tech-mode .container {
+            background: rgba(15, 12, 41, 0.9);
+            box-shadow: 0 8px 32px rgba(79, 172, 254, 0.3);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+        }
+        
+        body.tech-mode .container::before {
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.2) 0%, transparent 70%);
+        }
+        
+        body.tech-mode .section {
+            background: rgba(15, 12, 41, 0.7);
+            box-shadow: 0 4px 20px rgba(79, 172, 254, 0.2);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+        }
+        
+        body.tech-mode .section:hover {
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+            border-color: rgba(79, 172, 254, 0.5);
+        }
+        
+        body.tech-mode .section-title {
+            color: #4facfe;
+            border-bottom: 1px solid rgba(79, 172, 254, 0.3);
+        }
+        
+        body.tech-mode .time-display {
+            text-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+        
+        body.tech-mode button {
+            background: linear-gradient(135deg, #4facfe, #667eea);
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+        
+        body.tech-mode button:hover {
+            box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+        }
+        
+        body.tech-mode .tech-button {
+            background: linear-gradient(135deg, #8e2de2, #4a00e0);
+        }
+        
+        body.tech-mode .tech-button:hover {
+            background: linear-gradient(135deg, #7d26d1, #3a00c0);
+        }
+/* 作业报告生成器样式 */
+.report-generator {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(10, 25, 47, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 242, 254, 0.2);
+}
+
+.report-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.report-type-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.report-type-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: var(--dark-color);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.report-type-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+}
+
+.report-type-btn.active {
+    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+}
+
+.report-preview {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 242, 254, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 242, 254, 0.1);
+    margin-top: 15px;
+    white-space: pre-wrap;
+    font-family: 'Courier New', monospace;
+}
+    </style>
+</head>
+<body>
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- 全屏图片查看器 -->
+    <div class="fullscreen-image-viewer" id="fullscreen-image-viewer">
+        <div class="fullscreen-image-container">
+            <img src="896.jpg" alt="网站作用说明" class="fullscreen-image">
+            <div class="close-fullscreen-image" id="close-fullscreen-image">&times;</div>
+        </div>
+    </div>
+    
+    <!-- 版本信息 -->
+    <div class="version-info">
+        <span>  老六正式版</span>
+        <span>  版本号：25.7.8</span>
+        <span>  © 归星皓版权所有</span>
+    </div>
+    
+    <div class="container">
+        <h1><i class="fas fa-code"></i>欢迎使用老六网站</h1>
+        
+        <div id="status-message"></div>
+        
+        <!-- 北京时间显示 -->
+        <div class="section">
+            <h2 class="section-title"><i class="far fa-clock"></i>北京时间</h2>
+            <div class="workday-info" id="workday-info"></div>
+            <div class="work-status" id="work-status">状态: <span class="status-none">无状态</span></div>
+            <div class="time-display" id="beijing-time">正在加载时间...</div>
+        </div>
+        
+        <!-- 作业负担智能分析 -->
+        <div class="section" id="homework-analysis-section">
+            <h2 class="section-title"><i class="fas fa-book"></i>作业负担智能分析</h2>
+            <div class="homework-analysis">
+                <!-- 语文 -->
+                <div class="subject-row" data-subject="chinese">
+                    <div class="subject-name">语文</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'chinese-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="chinese-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="chinese-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'chinese-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="chinese-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="chinese-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'chinese-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="chinese-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="chinese-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 数学 -->
+                <div class="subject-row" data-subject="math">
+                    <div class="subject-name">数学</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'math-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="math-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="math-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'math-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="math-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="math-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'math-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="math-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="math-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 英语 -->
+                <div class="subject-row" data-subject="english">
+                    <div class="subject-name">英语</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'english-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="english-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="english-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'english-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="english-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="english-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'english-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="english-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="english-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 生物 -->
+                <div class="subject-row" data-subject="biology">
+                    <div class="subject-name">生物</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'biology-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="biology-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="biology-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'biology-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="biology-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="biology-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'biology-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="biology-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="biology-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 地理 -->
+                <div class="subject-row" data-subject="geography">
+                    <div class="subject-name">地理</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'geography-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="geography-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="geography-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'geography-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="geography-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="geography-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'geography-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="geography-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="geography-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 道法 -->
+                <div class="subject-row" data-subject="ethics">
+                    <div class="subject-name">道法</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'ethics-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="ethics-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="ethics-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'ethics-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="ethics-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="ethics-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'ethics-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="ethics-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="ethics-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 历史 -->
+                <div class="subject-row" data-subject="history">
+                    <div class="subject-name">历史</div>
+                    <div class="task-item">
+                        <div class="task-label">练习册页数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'history-workbook')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="history-workbook-input" placeholder="页数" min="1">
+                        <select class="task-difficulty" id="history-workbook-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">试卷卷数:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'history-test')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="number" class="task-input" id="history-test-input" placeholder="卷数" min="1">
+                        <select class="task-difficulty" id="history-test-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-label">其他:</div>
+                        <select class="task-toggle" onchange="toggleTaskInput(this, 'history-other')">
+                            <option value="no">无</option>
+                            <option value="yes">有</option>
+                        </select>
+                        <input type="text" class="task-input" id="history-other-input" placeholder="其他作业">
+                        <select class="task-difficulty" id="history-other-difficulty">
+                            <option value="1">轻</option>
+                            <option value="2">较重</option>
+                            <option value="3">重</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button id="calculate-homework-btn" onclick="calculateHomeworkBurden()"><i class="fas fa-calculator"></i> 计算作业负担</button>
+                
+                <div class="progress-container" id="progress-container" style="display: none;">
+                    <div class="progress-bar" id="progress-bar">0%</div>
+                </div>
+                
+                <div class="result-container" id="result-container" style="display: none;">
+                    <div class="result-face" id="result-face"></div>
+                    <div id="result-text"></div>
+                    <div>
+                        <button class="tech-mode-btn" id="tech-mode-btn" style="display: none;"><i class="fas fa-robot"></i> 科技强国模式</button>
+                        <button id="meme-btn" style="margin-left: 10px;"><i class="far fa-smile"></i> 表情包</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 番茄时钟 -->
+        <div class="section" id="tomato-section">
+            <h2 class="section-title"><i class="fas fa-hourglass-half"></i>番茄时钟</h2>
+            <div>
+                <label for="tomato-minutes">工作时间 (分钟):</label>
+                <input type="number" id="tomato-minutes" min="1" value="25">
+                
+                <label for="break-minutes">休息时间 (分钟):</label>
+                <input type="number" id="break-minutes" min="1" value="5">
+            </div>
+            
+            <div id="tomato-timer-display">25:00</div>
+            <div id="tomato-status">准备开始</div>
+            
+            <div class="timer-controls">
+                <button id="start-tomato"><i class="fas fa-play"></i> 开始</button>
+                <button id="pause-tomato"><i class="fas fa-pause"></i> 暂停</button>
+                <button id="reset-tomato"><i class="fas fa-redo"></i> 重置</button>
+            </div>
+        </div>
+        
+        <!-- 倒计时 -->
+        <div class="section" id="countdown-section">
+            <h2 class="section-title"><i class="fas fa-stopwatch"></i>倒计时</h2>
+            <div>
+                <label for="countdown-hours">小时:</label>
+                <input type="number" id="countdown-hours" min="0" value="0">
+                
+                <label for="countdown-minutes">分钟:</label>
+                <input type="number" id="countdown-minutes" min="0" value="10">
+                
+                <label for="countdown-seconds">秒:</label>
+                <input type="number" id="countdown-seconds" min="0" value="0">
+            </div>
+            
+            <div id="countdown-display">10:00</div>
+            
+            <div class="timer-controls">
+                <button id="start-countdown"><i class="fas fa-play"></i> 开始</button>
+                <button id="pause-countdown"><i class="fas fa-pause"></i> 暂停</button>
+                <button id="reset-countdown"><i class="fas fa-redo"></i> 重置</button>
+            </div>
+        </div>
+        
+        <!-- 正计时 -->
+        <div class="section" id="stopwatch-section">
+            <h2 class="section-title"><i class="fas fa-stopwatch-20"></i>正计时</h2>
+            <div id="stopwatch-display">00:00:00</div>
+            <div id="stopwatch-status">准备开始</div>
+            
+            <div class="timer-controls">
+                <button id="start-stopwatch"><i class="fas fa-play"></i> 开始</button>
+                <button id="pause-stopwatch"><i class="fas fa-pause"></i> 暂停</button>
+                <button id="reset-stopwatch"><i class="fas fa-redo"></i> 重置</button>
+                <button id="stop-stopwatch" style="display: none;"><i class="fas fa-stop"></i> 停止</button>
+            </div>
+            
+            <div class="subject-buttons" id="subject-buttons">
+                <button class="subject-btn" id="save-subject-btn"><i class="fas fa-save"></i> 科目时间保存</button>
+                <button class="subject-btn" id="download-subject-btn"><i class="fas fa-download"></i> 下载</button>
+            </div>
+        </div>
+        
+        <!-- 计划计时器 -->
+        <div class="section" id="schedule-section">
+            <h2 class="section-title"><i class="fas fa-calendar-alt"></i>计划计时器</h2>
+            <div class="schedule-date-selector">
+                <label for="schedule-date">日期:</label>
+                <select id="schedule-date">
+                    <option value="today">今天</option>
+                    <option value="tomorrow">明天</option>
+                </select>
+                
+                <label for="schedule-time">时间 (HH:MM):</label>
+                <input type="time" id="schedule-time">
+            </div>
+            
+            <div id="schedule-display">--:--:--</div>
+            <div id="schedule-status">未设置</div>
+            
+            <div class="timer-controls">
+                <button id="start-schedule"><i class="fas fa-play"></i> 开始</button>
+                <button id="stop-schedule"><i class="fas fa-stop"></i> 停止</button>
+            </div>
+        </div>
+        
+        <!-- 科目倒计时 -->
+        <div class="section" id="subject-countdown-section">
+            <h2 class="section-title"><i class="fas fa-book-open"></i>科目倒计时</h2>
+            <div class="subject-countdown-info" id="subject-countdown-info">
+                科目: <span class="subject-countdown-name" id="subject-countdown-name">未设置</span>
+                | 时间: <span class="subject-countdown-time" id="subject-countdown-time">00:00:00</span>
+            </div>
+            <div id="subject-countdown-display">00:00:00</div>
+            <div id="subject-countdown-status">准备开始</div>
+            
+            <div class="timer-controls">
+                <button id="start-subject-countdown"><i class="fas fa-play"></i> 开始</button>
+                <button id="pause-subject-countdown"><i class="fas fa-pause"></i> 暂停</button>
+                <button id="reset-subject-countdown"><i class="fas fa-redo"></i> 重置</button>
+                <button class="insert-btn" id="insert-subject-countdown"><i class="fas fa-plus"></i> 植入</button>
+                <button class="sort-btn" id="sort-subjects-btn"><i class="fas fa-sort"></i> 排序</button>
+                <button class="delete-btn" id="delete-subjects-btn"><i class="fas fa-trash"></i> 全部删除</button>
+            </div>
+        </div>
+        
+        <!-- 音乐播放器 -->
+        <div class="section" id="music-section">
+            <h2 class="section-title"><i class="fas fa-music"></i>音乐播放器</h2>
+            <div class="music-player">
+                <div class="video-player" id="video-player">
+                    <video id="video-element" controls></video>
+                </div>
+                <audio id="audio-element"></audio>
+                <div class="music-info">
+                    <div class="music-title" id="music-title">未选择音乐</div>
+                    <div class="music-progress">
+                        <div class="music-progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="music-time">
+                        <span id="current-time">00:00</span>
+                        <span id="duration">00:00</span>
+                    </div>
+                </div>
+                <div class="music-controls">
+                    <button id="prev-btn"><i class="fas fa-step-backward"></i></button>
+                    <button id="play-btn"><i class="fas fa-play"></i></button>
+                    <button id="next-btn"><i class="fas fa-step-forward"></i></button>
+                    <button id="repeat-btn"><i class="fas fa-redo"></i></button>
+                    <button id="volume-btn"><i class="fas fa-volume-up"></i></button>
+                </div>
+                <div class="music-volume">
+                    <i class="fas fa-volume-down"></i>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.7">
+                    <i class="fas fa-volume-up"></i>
+                </div>
+                <div class="playlist" id="playlist">
+                    <!-- 播放列表将在这里动态生成 -->
+                </div>
+                
+                <!-- 文件上传区域 -->
+                <div class="file-upload-container">
+                    <label for="file-upload" class="file-upload-btn">
+                        <i class="fas fa-upload"></i> 上传音乐/视频文件
+                    </label>
+                    <input type="file" id="file-upload" class="file-input" accept="audio/*,video/*" multiple webkitdirectory directory>
+                    <div class="upload-status" id="upload-status"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 云端储存 -->
+        <div class="section" id="cloud-storage-section">
+            <h2 class="section-title"><i class="fas fa-cloud-upload-alt"></i>云端储存</h2>
+            <div class="cloud-storage-container">
+                <div class="cloud-storage-controls">
+                    <label for="file-storage-upload" class="file-upload-btn">
+                        <i class="fas fa-upload"></i> 上传文件
+                    </label>
+                    <input type="file" id="file-storage-upload" class="file-input" multiple webkitdirectory directory>
+                    <input type="text" id="file-code-input" placeholder="输入提取码" style="flex-grow: 1;">
+                    <button id="retrieve-file-btn"><i class="fas fa-download"></i> 提取文件</button>
+                    <button id="repeat-cloud-btn"><i class="fas fa-redo"></i> 重复播放</button>
+                </div>
+                <div class="cloud-storage-gallery" id="cloud-storage-gallery">
+                    <!-- 文件将在这里动态显示 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 唯一网址 -->
+        <div class="section" id="unique-url-section">
+            <h2 class="section-title"><i class="fas fa-link"></i>唯一访问网址</h2>
+            <div class="unique-url-container">
+                <p>使用以下网址可直接访问此页面:</p>
+                <div class="unique-url" id="unique-url">file:///X:/Users/Administrator/Desktop/%E7%A7%91%E6%8A%80/老六网站.html?id=1748051398833-qkqrb3
+               </div>
+                <button class="copy-url-btn" id="copy-url-btn">
+                    <i class="far fa-copy"></i> 复制网址
+                </button>
+            </div>
+        </div>
+        
+        <!-- 科技强国 -->
+        <div class="section" id="tech-section">
+            <h2 class="section-title"><i class="fas fa-robot"></i>科技强国</h2>
+            <div class="tech-buttons">
+                <button class="tech-button" id="single-open"><i class="fas fa-window-maximize"></i> 单开</button>
+                <button class="tech-button" id="double-open"><i class="fas fa-window-restore"></i> 双开</button>
+                <button class="tech-button" id="triple-open"><i class="fas fa-th"></i> 三开</button>
+                <button class="tech-button" id="quintuple-open"><i class="fas fa-th-large"></i> 五开</button>
+            </div>
+        </div>
+        
+        <!-- DeepSeek常用语言 -->
+        <div class="section" id="deepseek-section">
+            <h2 class="section-title"><i class="fas fa-comment-dots"></i>DeepSeek常用语言</h2>
+            <div id="deepseek-items-container">
+                <div class="deepseek-item">
+                    <span>1. 帮我提取中文，并生成能直接复制的框</span>
+                    <button class="deepseek-copy-btn" data-text="帮我提取中文，并生成能直接复制的框"><i class="far fa-copy"></i> 复制</button>
+                </div>
+                <div class="deepseek-item">
+                    <span>2. 帮我翻译英文，并生成能直接复制的框</span>
+                    <button class="deepseek-copy-btn" data-text="帮我翻译英文，并生成能直接复制的框"><i class="far fa-copy"></i> 复制</button>
+                </div>
+                <div class="deepseek-item">
+                    <span>3. 帮我检查作业，并给出详细解答</span>
+                    <button class="deepseek-copy-btn" data-text="帮我检查作业，并给出详细解答"><i class="far fa-copy"></i> 复制</button>
+                </div>
+                <div class="deepseek-item">
+                    <span>4. 帮我写作业</span>
+                    <button class="deepseek-copy-btn" data-text="帮我写作业"><i class="far fa-copy"></i> 复制</button>
+                </div>
+            </div>
+            <div class="add-deepseek-item">
+                <button class="add-deepseek-btn" id="add-deepseek-btn">+</button>
+            </div>
+        </div>
+        
+        <!-- 作业负担分析链接 -->
+        <div class="website-purpose-link" id="homework-analysis-link">
+            <i class="fas fa-book"></i> 作业负担分析系统
+        </div>
+        <!-- 网站作用按钮和开发者模式链接 -->
+        <div style="text-align: center; margin-top: 20px;">
+            <div class="website-purpose-link" id="website-purpose-link"><i class="fas fa-info-circle"></i> 网站作用</div>
+            <div class="developer-link" id="developer-link"><i class="fas fa-code"></i> 开发者模式</div>
+        </div>
+        
+        <!-- 开发者模式面板 -->
+        <div class="developer-panel" id="developer-panel">
+            <h3><i class="fas fa-cog"></i> 开发者模式</h3>
+            <div class="setting-item">
+                <span><i class="fas fa-calendar-day"></i> 强制设置日期类型:</span>
+                <select id="force-day-type">
+                    <option value="auto">自动判断</option>
+                    <option value="workday">工作日</option>
+                    <option value="techday">科技日</option>
+                    <option value="holiday">休息日</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-user-clock"></i> 工作状态:</span>
+                <select id="work-status-select">
+                    <option value="none">无状态</option>
+                    <option value="working">工作中</option>
+                    <option value="rest">休息</option>
+                </select>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-stopwatch"></i> 正计时提取功能</span>
+                <label class="switch">
+                    <input type="checkbox" id="stopwatch-extract-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-book"></i> 正计时提取(科目排版)</span>
+                <label class="switch">
+                    <input type="checkbox" id="subject-extract-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-robot"></i> 显示科技强国栏目</span>
+                <label class="switch">
+                    <input type="checkbox" id="tech-section-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-music"></i> 音乐播放器</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-music-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-cloud"></i> 云端储存</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-cloud-storage-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-link"></i> 唯一网址</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-unique-url-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-hourglass-half"></i> 番茄时钟</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-tomato-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-stopwatch"></i> 倒计时</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-countdown-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-stopwatch-20"></i> 正计时</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-stopwatch-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-calendar-alt"></i> 计划计时器</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-schedule-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-book-open"></i> 科目倒计时</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-subject-countdown-section" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-robot"></i> 科技强国</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-tech-section">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-robot"></i> 科技强国模式</span>
+                <label class="switch">
+                    <input type="checkbox" id="tech-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-trophy"></i> 遥遥领先模式</span>
+                <label class="switch">
+                    <input type="checkbox" id="yaoyao-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span><i class="fas fa-comment-dots"></i> DeepSeek常用语言</span>
+                <label class="switch">
+                    <input type="checkbox" id="toggle-deepseek-section">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 科目名称输入弹窗 -->
+    <div class="modal" id="subject-modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-book"></i> 输入科目名称</h3>
+            <input type="text" id="subject-name-input" class="modal-input" placeholder="请输入科目名称">
+            <div class="modal-buttons">
+                <button id="cancel-subject-btn"><i class="fas fa-times"></i> 取消</button>
+                <button id="confirm-subject-btn"><i class="fas fa-check"></i> 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开发者密码输入弹窗 -->
+    <div class="modal" id="developer-modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-lock"></i> 输入开发者密码</h3>
+            <input type="password" id="developer-password" class="modal-input" placeholder="请输入密码">
+            <div class="modal-buttons">
+                <button id="cancel-developer-btn"><i class="fas fa-times"></i> 取消</button>
+                <button id="confirm-developer-btn"><i class="fas fa-check"></i> 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 科目倒计时植入弹窗 -->
+    <div class="modal" id="subject-countdown-modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-plus-circle"></i> 植入科目倒计时</h3>
+            <label for="subject-name">科目名称:</label>
+            <input type="text" id="subject-name" class="modal-input" placeholder="请输入科目名称">
+            <label for="subject-hours">小时:</label>
+            <input type="number" id="subject-hours" min="0" value="0" class="modal-input">
+            <label for="subject-minutes">分钟:</label>
+            <input type="number" id="subject-minutes" min="0" value="30" class="modal-input">
+            <label for="subject-seconds">秒:</label>
+            <input type="number" id="subject-seconds" min="0" value="0" class="modal-input">
+            <div class="modal-buttons">
+                <button id="cancel-subject-countdown-btn"><i class="fas fa-times"></i> 取消</button>
+                <button id="confirm-subject-countdown-btn"><i class="fas fa-check"></i> 确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 在modal弹窗区域新增 -->
+    <div class="modal" id="yaoyao-modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-trophy"></i> 遥遥领先</h3>
+            <p>正在循环播放遥遥领先...</p>
+            <audio id="yaoyao-audio" loop></audio>
+            <div class="modal-buttons">
+                <button id="stop-yaoyao-btn"><i class="fas fa-stop"></i> 停止播放</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 科目排序弹窗 -->
+    <div class="modal" id="sort-modal">
+        <div class="modal-content">
+            <h3 class="modal-title"><i class="fas fa-sort"></i> 科目排序</h3>
+            <p>拖动科目进行排序，然后点击"确认排序"按钮</p>
+            <ul class="sortable-list" id="sortable-list">
+                <!-- 科目列表将在这里动态生成 -->
+            </ul>
+            <div class="modal-buttons">
+                <button id="cancel-sort-btn"><i class="fas fa-times"></i> 取消</button>
+                <button id="confirm-sort-btn"><i class="fas fa-check"></i> 确认排序</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主函数
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化粒子背景
+            initParticles();
+       
+            // 初始化时间显示
+            updateBeijingTime();
+            setInterval(updateBeijingTime, 1000);
+            
+            // 初始化番茄时钟
+            initTomatoTimer();
+            
+            // 初始化倒计时
+            initCountdown();
+            
+            // 初始化正计时
+            initStopwatch();
+            
+            // 初始化计划计时器
+            initScheduleTimer();
+            
+            // 初始化科目倒计时
+            initSubjectCountdown();
+            
+            // 初始化音乐播放器
+            initMusicPlayer();
+            
+            // 初始化云端储存
+            initCloudStorage();
+            
+            // 初始化唯一网址
+            initUniqueUrl();
+            
+            // 初始化科技强国按钮
+            initTechButtons();
+            
+            // 初始化DeepSeek常用语言
+            initDeepSeekSection();
+            
+            // 初始化科目时间保存功能
+            initSubjectTime();
+            
+            // 初始化开发者模式
+            initDeveloperMode();
+            
+            // 初始化网站作用图片查看器
+            initWebsitePurposeViewer();
+           
+            // 初始化作业负担分析系统链接
+            initHomeworkAnalysisLink();
+
+            // 初始化作业负担分析
+            initHomeworkAnalysis();
+        });
+
+        // 初始化网站作用图片查看器
+        function initWebsitePurposeViewer() {
+            const websitePurposeLink = document.getElementById('website-purpose-link');
+            const fullscreenImageViewer = document.getElementById('fullscreen-image-viewer');
+            const closeFullscreenImage = document.getElementById('close-fullscreen-image');
+            
+            // 点击网站作用按钮显示896.jpg
+            websitePurposeLink.addEventListener('click', function() {
+                    const viewerImg = fullscreenImageViewer.querySelector('.fullscreen-image');
+                    viewerImg.src = '896.jpg';  // 固定加载896.jpg
+                    viewerImg.alt = '网站作用说明';
+                    fullscreenImageViewer.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+            });
+            
+            // 点击关闭按钮隐藏全屏图片
+            closeFullscreenImage.addEventListener('click', function() {
+                  fullscreenImageViewer.style.display = 'none';
+                  document.body.style.overflow = ''; 
+            });
+            
+            // 点击图片外部区域也可以关闭
+            fullscreenImageViewer.addEventListener('click', function(e) {
+                if (e.target === fullscreenImageViewer) {
+                    fullscreenImageViewer.style.display = 'none';
+                    document.body.style.overflow = ''; 
+                }
+            });
+        }
+
+            // 初始化作业负担分析系统链接
+            function initHomeworkAnalysisLink() {
+            const homeworkAnalysisLink = document.getElementById('homework-analysis-link');
+    
+            homeworkAnalysisLink.addEventListener('click', function() {
+                      window.open('作业负担智能分析智能保存系统.html', '_blank');
+            });
+        }
+
+        // 初始化粒子背景
+        function initParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 随机大小
+                const size = Math.random() * 5 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // 随机位置
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // 随机透明度
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                // 随机动画
+                const duration = Math.random() * 20 + 10;
+                particle.style.animation = `float ${duration}s linear infinite`;
+                
+                // 添加动画关键帧
+                const keyframes = `
+                    @keyframes float {
+                        0% {
+                            transform: translate(0, 0);
+                        }
+                        50% {
+                            transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px);
+                        }
+                        100% {
+                            transform: translate(0, 0);
+                        }
+                    }
+                `;
+                
+                const style = document.createElement('style');
+                style.innerHTML = keyframes;
+                document.head.appendChild(style);
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 更新北京时间 - 修复版
+        function updateBeijingTime() {
+            const now = new Date();
+            
+            // 手动计算北京时间 (UTC+8)
+            const beijingOffset = 8 * 60 * 60 * 1000; // 8小时的毫秒数
+            const beijingTime = new Date(now.getTime() + beijingOffset);
+            
+            // 格式化日期和时间
+            const year = beijingTime.getUTCFullYear();
+            const month = String(beijingTime.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(beijingTime.getUTCDate()).padStart(2, '0');
+            const hours = String(beijingTime.getUTCHours()).padStart(2, '0');
+            const minutes = String(beijingTime.getUTCMinutes()).padStart(2, '0');
+            const seconds = String(beijingTime.getUTCSeconds()).padStart(2, '0');
+            
+            // 获取星期几
+            const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+            const weekday = weekdays[beijingTime.getUTCDay()];
+            
+            // 判断日期类型 (周五为科技日，周末为休息日，其他为工作日)
+            const dayOfWeek = beijingTime.getUTCDay();
+            let dayType, dayClass;
+            
+            // 检查是否强制设置了日期类型
+            const forceDayType = document.getElementById('force-day-type').value;
+            
+            if (forceDayType !== 'auto') {
+                // 使用强制设置的日期类型
+                switch(forceDayType) {
+                    case 'workday':
+                        dayType = "工作日";
+                        dayClass = "workday";
+                        break;
+                    case 'techday':
+                        dayType = "科技日";
+                        dayClass = "techday";
+                        break;
+                    case 'holiday':
+                        dayType = "休息日";
+                        dayClass = "holiday";
+                        break;
+                }
+            } else {
+                // 自动判断日期类型
+                if (dayOfWeek === 5) { // 星期五
+                    dayType = "科技日";
+                    dayClass = "techday";
+                } else if (dayOfWeek === 0 || dayOfWeek === 6) { // 周末
+                    dayType = "休息日";
+                    dayClass = "holiday";
+                } else { // 工作日
+                    dayType = "工作日";
+                    dayClass = "workday";
+                }
+            }
+            
+            document.getElementById('beijing-time').textContent = 
+                `${year}年${month}月${day}日 ${weekday} ${hours}:${minutes}:${seconds}`;
+                
+            document.getElementById('workday-info').innerHTML = 
+                `今天是: <span class="${dayClass}">${dayType}</span>`;
+                
+            return {
+                hours: parseInt(hours),
+                minutes: parseInt(minutes),
+                seconds: parseInt(seconds),
+                fullTime: beijingTime
+            };
+        }
+        
+        // 更新工作状态显示
+        function updateWorkStatus() {
+            const statusSelect = document.getElementById('work-status-select');
+            const statusValue = statusSelect.value;
+            const statusElement = document.getElementById('work-status');
+            
+            switch(statusValue) {
+                case 'working':
+                    statusElement.innerHTML = `状态: <span class="status-working">工作中</span>`;
+                    break;
+                case 'rest':
+                    statusElement.innerHTML = `状态: <span class="status-rest">休息</span>`;
+                    break;
+                case 'none':
+                default:
+                    statusElement.innerHTML = `状态: <span class="status-none">无状态</span>`;
+                    break;
+            }
+        }
+        
+        // 播放提示音（改进版，声音更长）
+        function playNotificationSound() {
+            // 创建一个音频上下文
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = "sine";
+            oscillator.frequency.value = 880; // 频率 (Hz)
+            gainNode.gain.value = 0.5; // 音量
+            
+            oscillator.start();
+            // 延长声音持续时间到3秒，并添加变化
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + 1);
+            gainNode.gain.exponentialRampToValueAtTime(0.5, audioContext.currentTime + 1.5);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+            oscillator.stop(audioContext.currentTime + 3);
+        }
+        
+        // 番茄时钟功能
+        function initTomatoTimer() {
+            const tomatoMinutesInput = document.getElementById('tomato-minutes');
+            const breakMinutesInput = document.getElementById('break-minutes');
+            const tomatoTimerDisplay = document.getElementById('tomato-timer-display');
+            const tomatoStatus = document.getElementById('tomato-status');
+            const startButton = document.getElementById('start-tomato');
+            const pauseButton = document.getElementById('pause-tomato');
+            const resetButton = document.getElementById('reset-tomato');
+            const tomatoSection = document.getElementById('tomato-section');
+            
+            let tomatoInterval;
+            let isWorking = true;
+            let timeLeft = 25 * 60;
+            let isRunning = false;
+            let isPaused = false;
+            let remainingTimeOnPause = 0;
+            
+            function updateTomatoDisplay() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                tomatoTimerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            function startTomato() {
+                if (isRunning && !isPaused) return;
+                
+                if (!isRunning && !isPaused) {
+                    // 全新开始
+                    timeLeft = isWorking ? parseInt(tomatoMinutesInput.value) * 60 : parseInt(breakMinutesInput.value) * 60;
+                } else if (isPaused) {
+                    // 从暂停恢复
+                    timeLeft = remainingTimeOnPause;
+                    isPaused = false;
+                }
+                
+                updateTomatoDisplay();
+                isRunning = true;
+                tomatoSection.classList.add('active-timer');
+                tomatoStatus.textContent = isWorking ? '工作中...' : '休息中...';
+                
+                tomatoInterval = setInterval(function() {
+                    timeLeft--;
+                    updateTomatoDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(tomatoInterval);
+                        isRunning = false;
+                        isWorking = !isWorking;
+                        
+                        playNotificationSound();
+                        
+                        if (isWorking) {
+                            tomatoStatus.textContent = '休息时间结束！准备开始工作时间';
+                            timeLeft = parseInt(tomatoMinutesInput.value) * 60;
+                            alert('休息时间结束！准备开始工作时间');
+                        } else {
+                            tomatoStatus.textContent = '工作时间结束！准备开始休息时间';
+                            timeLeft = parseInt(breakMinutesInput.value) * 60;
+                            alert('工作时间结束！准备开始休息时间');
+                        }
+                        
+                        tomatoSection.classList.remove('active-timer');
+                        updateTomatoDisplay();
+                    }
+                }, 1000);
+            }
+            
+            function pauseTomato() {
+                if (!isRunning || isPaused) return;
+                clearInterval(tomatoInterval);
+                isRunning = false;
+                isPaused = true;
+                remainingTimeOnPause = timeLeft;
+                tomatoSection.classList.remove('active-timer');
+                tomatoStatus.textContent = '已暂停';
+            }
+            
+            function resetTomato() {
+                clearInterval(tomatoInterval);
+                isRunning = false;
+                isPaused = false;
+                isWorking = true;
+                timeLeft = parseInt(tomatoMinutesInput.value) * 60;
+                tomatoStatus.textContent = '准备开始';
+                tomatoSection.classList.remove('active-timer');
+                updateTomatoDisplay();
+            }
+            
+            startButton.addEventListener('click', startTomato);
+            pauseButton.addEventListener('click', pauseTomato);
+            resetButton.addEventListener('click', resetTomato);
+            updateTomatoDisplay();
+        }
+        
+        // 倒计时功能
+        function initCountdown() {
+            const hoursInput = document.getElementById('countdown-hours');
+            const minutesInput = document.getElementById('countdown-minutes');
+            const secondsInput = document.getElementById('countdown-seconds');
+            const countdownDisplay = document.getElementById('countdown-display');
+            const startButton = document.getElementById('start-countdown');
+            const pauseButton = document.getElementById('pause-countdown');
+            const resetButton = document.getElementById('reset-countdown');
+            const countdownSection = document.getElementById('countdown-section');
+            
+            let countdownInterval;
+            let timeLeft = 10 * 60;
+            let isRunning = false;
+            let isPaused = false;
+            let remainingTimeOnPause = 0;
+            
+            function updateCountdownDisplay() {
+                const hours = Math.floor(timeLeft / 3600);
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const seconds = timeLeft % 60;
+                
+                countdownDisplay.textContent = hours > 0 
+                    ? `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+                    : `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            function startCountdown() {
+                if (isRunning && !isPaused) return;
+                
+                if (!isRunning && !isPaused) {
+                    // 全新开始
+                    const hours = parseInt(hoursInput.value) || 0;
+                    const minutes = parseInt(minutesInput.value) || 0;
+                    const seconds = parseInt(secondsInput.value) || 0;
+                    timeLeft = hours * 3600 + minutes * 60 + seconds;
+                    
+                    if (timeLeft <= 0) {
+                        alert('请设置有效的倒计时时间！');
+                        return;
+                    }
+                } else if (isPaused) {
+                    // 从暂停恢复
+                    timeLeft = remainingTimeOnPause;
+                    isPaused = false;
+                }
+                
+                updateCountdownDisplay();
+                isRunning = true;
+                countdownSection.classList.add('active-timer');
+                
+                countdownInterval = setInterval(function() {
+                    timeLeft--;
+                    updateCountdownDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        isRunning = false;
+                        countdownSection.classList.remove('active-timer');
+                        playNotificationSound();
+                        alert('倒计时结束！');
+                    }
+                }, 1000);
+            }
+            
+            function pauseCountdown() {
+                if (!isRunning || isPaused) return;
+                clearInterval(countdownInterval);
+                isRunning = false;
+                isPaused = true;
+                remainingTimeOnPause = timeLeft;
+                countdownSection.classList.remove('active-timer');
+            }
+            
+            function resetCountdown() {
+                clearInterval(countdownInterval);
+                isRunning = false;
+                isPaused = false;
+                const hours = parseInt(hoursInput.value) || 0;
+                const minutes = parseInt(minutesInput.value) || 0;
+                const seconds = parseInt(secondsInput.value) || 0;
+                timeLeft = hours * 3600 + minutes * 60 + seconds;
+                countdownSection.classList.remove('active-timer');
+                updateCountdownDisplay();
+            }
+            
+            startButton.addEventListener('click', startCountdown);
+            pauseButton.addEventListener('click', pauseCountdown);
+            resetButton.addEventListener('click', resetCountdown);
+            updateCountdownDisplay();
+        }
+        
+        // 正计时功能
+        function initStopwatch() {
+            const stopwatchDisplay = document.getElementById('stopwatch-display');
+            const stopwatchStatus = document.getElementById('stopwatch-status');
+            const startButton = document.getElementById('start-stopwatch');
+            const pauseButton = document.getElementById('pause-stopwatch');
+            const resetButton = document.getElementById('reset-stopwatch');
+            const stopButton = document.getElementById('stop-stopwatch');
+            const stopwatchSection = document.getElementById('stopwatch-section');
+            
+            let stopwatchInterval;
+            let seconds = 0;
+            let isRunning = false;
+            let isPaused = false;
+            let elapsedTimeOnPause = 0;
+            let startTime = 0;
+            
+            function updateStopwatchDisplay() {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                stopwatchDisplay.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            function startStopwatch() {
+                if (isRunning && !isPaused) return;
+                
+                if (!isRunning && !isPaused) {
+                    // 全新开始
+                    seconds = 0;
+                    startTime = Date.now();
+                } else if (isPaused) {
+                    // 从暂停恢复
+                    startTime = Date.now() - (elapsedTimeOnPause * 1000);
+                    isPaused = false;
+                }
+                
+                updateStopwatchDisplay();
+                isRunning = true;
+                stopwatchSection.classList.add('active-timer');
+                stopwatchStatus.textContent = '计时中...';
+                
+                // 使用更精确的计时方式
+                stopwatchInterval = setInterval(function() {
+                    const currentTime = Date.now();
+                    seconds = Math.floor((currentTime - startTime) / 1000);
+                    updateStopwatchDisplay();
+                }, 100);
+            }
+            
+            function pauseStopwatch() {
+                if (!isRunning || isPaused) return;
+                clearInterval(stopwatchInterval);
+                isRunning = false;
+                isPaused = true;
+                elapsedTimeOnPause = seconds;
+                stopwatchSection.classList.remove('active-timer');
+                stopwatchStatus.textContent = '已暂停';
+            }
+            
+            function resetStopwatch() {
+                clearInterval(stopwatchInterval);
+                isRunning = false;
+                isPaused = false;
+                seconds = 0;
+                stopwatchStatus.textContent = '准备开始';
+                stopwatchSection.classList.remove('active-timer');
+                updateStopwatchDisplay();
+            }
+            
+            function stopStopwatch() {
+                clearInterval(stopwatchInterval);
+                isRunning = false;
+                isPaused = false;
+                stopwatchSection.classList.remove('active-timer');
+                stopwatchStatus.textContent = '已停止';
+                
+                // 保存时间到指定路径
+                saveStopwatchTimeToFile(seconds);
+            }
+            
+            function saveStopwatchTimeToFile(totalSeconds) {
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const secs = totalSeconds % 60;
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                const now = new Date();
+                const dateString = `${now.getFullYear()}年${(now.getMonth()+1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日`;
+                const fileName = `正计时记录_${dateString}.txt`;
+                const content = `正计时时间: ${timeString}\n记录时间: ${dateString} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                
+                // 创建Blob对象
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                // 设置下载路径为 X:/Users/Administrator/Desktop/计时时间/
+                a.download = 'X:/Users/Administrator/Desktop/计时时间/' + fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+                
+                showStatus(`已保存正计时时间到桌面计时时间文件夹`, 'success');
+            }
+            
+            startButton.addEventListener('click', startStopwatch);
+            pauseButton.addEventListener('click', pauseStopwatch);
+            resetButton.addEventListener('click', resetStopwatch);
+            stopButton.addEventListener('click', stopStopwatch);
+            updateStopwatchDisplay();
+        }
+        
+        // 计划计时器功能
+        function initScheduleTimer() {
+            const scheduleDateSelect = document.getElementById('schedule-date');
+            const scheduleTimeInput = document.getElementById('schedule-time');
+            const scheduleDisplay = document.getElementById('schedule-display');
+            const scheduleStatus = document.getElementById('schedule-status');
+            const startButton = document.getElementById('start-schedule');
+            const stopButton = document.getElementById('stop-schedule');
+            const scheduleSection = document.getElementById('schedule-section');
+            
+            let scheduleInterval;
+            let targetTime = null;
+            let startTime = null;
+            let lastUpdateTime = 0;
+            let driftHistory = [];
+            
+            function updateScheduleDisplay() {
+                if (!targetTime || !startTime) {
+                    scheduleDisplay.textContent = '--:--:--';
+                    return;
+                }
+                
+                const now = new Date();
+                const currentTime = now.getTime();
+                
+                // 确保至少100ms才更新一次，避免过于频繁的更新
+                if (currentTime - lastUpdateTime < 100) {
+                    return;
+                }
+                lastUpdateTime = currentTime;
+                
+                // 计算从开始时间到目标时间的总毫秒数
+                const totalDuration = targetTime - startTime;
+                // 计算已经过去的毫秒数
+                const elapsed = currentTime - startTime;
+                // 计算剩余时间
+                let remaining = totalDuration - elapsed;
+                
+                // 减去24小时 (24 * 60 * 60 * 1000 = 86400000 毫秒)
+                remaining -= 86400000;
+                
+                if (remaining <= 0) {
+                    clearInterval(scheduleInterval);
+                    scheduleDisplay.textContent = '00:00:00';
+                    scheduleStatus.textContent = '时间到！';
+                    scheduleSection.classList.remove('active-timer');
+                    playNotificationSound();
+                    alert('计划时间到！');
+                    return;
+                }
+                
+                // 计算剩余的总秒数
+                const totalSeconds = Math.floor(remaining / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                
+                // 计算时间漂移
+                const expectedTime = lastUpdateTime + 1000;
+                const actualDrift = now.getTime() - expectedTime;
+                driftHistory.push(actualDrift);
+                
+                // 只保留最近的10次记录
+                if (driftHistory.length > 10) {
+                    driftHistory.shift();
+                }
+                
+                // 计算平均漂移
+                const averageDrift = driftHistory.reduce((a, b) => a + b, 0) / driftHistory.length;
+                
+                // 调整显示时间以补偿漂移
+                const adjustedRemaining = remaining - averageDrift;
+                const adjustedTotalSeconds = Math.floor(adjustedRemaining / 1000);
+                const adjustedHours = Math.floor(adjustedTotalSeconds / 3600);
+                const adjustedMinutes = Math.floor((adjustedTotalSeconds % 3600) / 60);
+                const adjustedSeconds = adjustedTotalSeconds % 60;
+                
+                scheduleDisplay.textContent = 
+                    `${adjustedHours.toString().padStart(2, '0')}:${adjustedMinutes.toString().padStart(2, '0')}:${adjustedSeconds.toString().padStart(2, '0')}`;
+            }
+            
+            function startSchedule() {
+                const timeValue = scheduleTimeInput.value;
+                if (!timeValue) {
+                    alert('请设置目标时间！');
+                    return;
+                }
+                
+                const [hours, minutes] = timeValue.split(':').map(Number);
+                const now = updateBeijingTime();
+                targetTime = new Date(now.fullTime);
+                
+                // 设置目标时间的小时和分钟
+                targetTime.setHours(hours);
+                targetTime.setMinutes(minutes);
+                targetTime.setSeconds(0);
+                targetTime.setMilliseconds(0);
+                
+                // 根据选择的日期调整
+                const dateSelection = scheduleDateSelect.value;
+                if (dateSelection === 'tomorrow') {
+                    targetTime.setDate(targetTime.getDate() + 1);
+                }
+                
+                // 如果选择的是今天但时间已经过去，自动设置为明天
+                if (dateSelection === 'today' && targetTime <= now.fullTime) {
+                    targetTime.setDate(targetTime.getDate() + 1);
+                }
+                
+                // 记录开始时间
+                startTime = now.fullTime.getTime();
+                
+                scheduleStatus.textContent = `目标时间: ${dateSelection === 'today' ? '今天' : '明天'} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+                scheduleSection.classList.add('active-timer');
+                
+                // 重置漂移历史
+                driftHistory = [];
+                lastUpdateTime = 0;
+                
+                // 使用更精确的定时器
+                updateScheduleDisplay();
+                scheduleInterval = setInterval(updateScheduleDisplay, 100);
+            }
+            
+            function stopSchedule() {
+                clearInterval(scheduleInterval);
+                targetTime = null;
+                startTime = null;
+                scheduleDisplay.textContent = '--:--:--';
+                scheduleStatus.textContent = '未设置';
+                scheduleSection.classList.remove('active-timer');
+            }
+            
+            startButton.addEventListener('click', startSchedule);
+            stopButton.addEventListener('click', stopSchedule);
+            updateScheduleDisplay();
+        }
+        
+        // 初始化科目倒计时功能
+        function initSubjectCountdown() {
+            const subjectCountdownDisplay = document.getElementById('subject-countdown-display');
+            const subjectCountdownStatus = document.getElementById('subject-countdown-status');
+            const subjectCountdownName = document.getElementById('subject-countdown-name');
+            const subjectCountdownTime = document.getElementById('subject-countdown-time');
+            const startButton = document.getElementById('start-subject-countdown');
+            const pauseButton = document.getElementById('pause-subject-countdown');
+            const resetButton = document.getElementById('reset-subject-countdown');
+            const insertButton = document.getElementById('insert-subject-countdown');
+            const sortButton = document.getElementById('sort-subjects-btn');
+            const deleteButton = document.getElementById('delete-subjects-btn');
+            const subjectCountdownSection = document.getElementById('subject-countdown-section');
+            const subjectCountdownModal = document.getElementById('subject-countdown-modal');
+            const sortModal = document.getElementById('sort-modal');
+            const sortableList = document.getElementById('sortable-list');
+            const confirmSortBtn = document.getElementById('confirm-sort-btn');
+            const cancelSortBtn = document.getElementById('cancel-sort-btn');
+            const subjectNameInput = document.getElementById('subject-name');
+            const subjectHoursInput = document.getElementById('subject-hours');
+            const subjectMinutesInput = document.getElementById('subject-minutes');
+            const subjectSecondsInput = document.getElementById('subject-seconds');
+            const confirmSubjectCountdownBtn = document.getElementById('confirm-subject-countdown-btn');
+            const cancelSubjectCountdownBtn = document.getElementById('cancel-subject-countdown-btn');
+            
+            let subjectCountdownInterval;
+            let timeLeft = 0;
+            let isRunning = false;
+            let isPaused = false;
+            let remainingTimeOnPause = 0;
+            let subjectName = '';
+            let totalTime = 0;
+            let subjects = []; // 存储所有科目信息
+            
+            function updateSubjectCountdownDisplay() {
+                const hours = Math.floor(timeLeft / 3600);
+                const minutes = Math.floor((timeLeft % 3600) / 60);
+                const seconds = timeLeft % 60;
+                
+                subjectCountdownDisplay.textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // 更新科目信息显示
+                const totalHours = Math.floor(totalTime / 3600);
+                const totalMinutes = Math.floor((totalTime % 3600) / 60);
+                const totalSecs = totalTime % 60;
+                
+                subjectCountdownTime.textContent = 
+                    `${totalHours.toString().padStart(2, '0')}:${totalMinutes.toString().padStart(2, '0')}:${totalSecs.toString().padStart(2, '0')}`;
+            }
+            
+            function startSubjectCountdown() {
+                if (isRunning && !isPaused) return;
+                
+                if (!subjectName) {
+                    alert('请先植入科目倒计时！');
+                    return;
+                }
+                
+                if (!isRunning && !isPaused) {
+                    // 全新开始
+                    timeLeft = totalTime;
+                } else if (isPaused) {
+                    // 从暂停恢复
+                    timeLeft = remainingTimeOnPause;
+                    isPaused = false;
+                }
+                
+                updateSubjectCountdownDisplay();
+                isRunning = true;
+                subjectCountdownSection.classList.add('active-timer');
+                subjectCountdownStatus.textContent = '倒计时中...';
+                
+                subjectCountdownInterval = setInterval(function() {
+                    timeLeft--;
+                    updateSubjectCountdownDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(subjectCountdownInterval);
+                        isRunning = false;
+                        subjectCountdownSection.classList.remove('active-timer');
+                        playNotificationSound();
+                        alert(`科目 "${subjectName}" 倒计时结束！`);
+                        
+                        // 自动开始下一个科目（如果有）
+                        startNextSubject();
+                    }
+                }, 1000);
+            }
+            
+            function startNextSubject() {
+                if (subjects.length > 0) {
+                    const nextSubject = subjects[0];
+                    subjectName = nextSubject.name;
+                    totalTime = nextSubject.time;
+                    timeLeft = totalTime;
+                    subjectCountdownName.textContent = subjectName;
+                    updateSubjectCountdownDisplay();
+                    
+                    // 从列表中移除当前科目
+                    subjects.shift();
+                    
+                    // 自动开始下一个科目
+                    startSubjectCountdown();
+                }
+            }
+            
+            function pauseSubjectCountdown() {
+                if (!isRunning || isPaused) return;
+                clearInterval(subjectCountdownInterval);
+                isRunning = false;
+                isPaused = true;
+                remainingTimeOnPause = timeLeft;
+                subjectCountdownSection.classList.remove('active-timer');
+                subjectCountdownStatus.textContent = '已暂停';
+            }
+            
+            function resetSubjectCountdown() {
+                clearInterval(subjectCountdownInterval);
+                isRunning = false;
+                isPaused = false;
+                timeLeft = totalTime;
+                subjectCountdownStatus.textContent = '准备开始';
+                subjectCountdownSection.classList.remove('active-timer');
+                updateSubjectCountdownDisplay();
+            }
+            
+            // 植入科目倒计时
+            insertButton.addEventListener('click', function() {
+                subjectCountdownModal.style.display = 'flex';
+                subjectNameInput.focus();
+            });
+            
+            // 确认植入科目倒计时
+            confirmSubjectCountdownBtn.addEventListener('click', function() {
+                const name = subjectNameInput.value.trim();
+                const hours = parseInt(subjectHoursInput.value) || 0;
+                const minutes = parseInt(subjectMinutesInput.value) || 0;
+                const seconds = parseInt(subjectSecondsInput.value) || 0;
+                
+                if (!name) {
+                    alert('请输入科目名称！');
+                    return;
+                }
+                
+                if (hours === 0 && minutes === 0 && seconds === 0) {
+                    alert('请设置有效的倒计时时间！');
+                    return;
+                }
+                
+                const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                
+                // 添加到科目列表
+                subjects.push({
+                    name: name,
+                    time: totalSeconds,
+                    hours: hours,
+                    minutes: minutes,
+                    seconds: seconds
+                });
+                
+                // 如果当前没有科目，设置为第一个科目
+                if (!subjectName) {
+                    subjectName = name;
+                    totalTime = totalSeconds;
+                    timeLeft = totalTime;
+                    subjectCountdownName.textContent = subjectName;
+                    updateSubjectCountdownDisplay();
+                }
+                
+                subjectCountdownModal.style.display = 'none';
+                subjectNameInput.value = '';
+                subjectHoursInput.value = '0';
+                subjectMinutesInput.value = '30';
+                subjectSecondsInput.value = '0';
+                
+                showStatus(`已植入科目 "${name}" 倒计时`, 'success');
+            });
+            
+            // 取消植入科目倒计时
+            cancelSubjectCountdownBtn.addEventListener('click', function() {
+                subjectCountdownModal.style.display = 'none';
+                subjectNameInput.value = '';
+                subjectHoursInput.value = '0';
+                subjectMinutesInput.value = '30';
+                subjectSecondsInput.value = '0';
+            });
+            
+            // 排序科目
+            sortButton.addEventListener('click', function() {
+                if (subjects.length === 0) {
+                    alert('没有可排序的科目！');
+                    return;
+                }
+                
+                // 填充排序列表
+                sortableList.innerHTML = '';
+                subjects.forEach((subject, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'sortable-item';
+                    li.dataset.index = index;
+                    li.innerHTML = `
+                        <span>${subject.name} <span class="subject-time">(${subject.hours.toString().padStart(2, '0')}:${subject.minutes.toString().padStart(2, '0')}:${subject.seconds.toString().padStart(2, '0')})</span></span>
+                        <i class="fas fa-grip-lines"></i>
+                    `;
+                    sortableList.appendChild(li);
+                });
+                
+                // 初始化拖拽排序
+                new Sortable(sortableList, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    onEnd: function(evt) {
+                        // 无需处理，排序会在确认时应用
+                    }
+                });
+                
+                sortModal.style.display = 'flex';
+            });
+            
+            // 确认排序
+            confirmSortBtn.addEventListener('click', function() {
+                const newSubjects = [];
+                const items = sortableList.querySelectorAll('.sortable-item');
+                
+                items.forEach(item => {
+                    const index = parseInt(item.dataset.index);
+                    newSubjects.push(subjects[index]);
+                });
+                
+                subjects = newSubjects;
+                sortModal.style.display = 'none';
+                
+                // 如果当前没有运行的科目，设置第一个科目为当前科目
+                if (!isRunning && !isPaused && subjects.length > 0) {
+                    const firstSubject = subjects[0];
+                    subjectName = firstSubject.name;
+                    totalTime = firstSubject.time;
+                    timeLeft = totalTime;
+                    subjectCountdownName.textContent = subjectName;
+                    updateSubjectCountdownDisplay();
+                    
+                    // 从列表中移除当前科目
+                    subjects.shift();
+                }
+                
+                showStatus('科目排序已更新', 'success');
+            });
+            
+            // 取消排序
+            cancelSortBtn.addEventListener('click', function() {
+                sortModal.style.display = 'none';
+            });
+            
+            // 删除所有科目
+            deleteButton.addEventListener('click', function() {
+                if (subjects.length === 0 && !subjectName) {
+                    alert('没有可删除的科目！');
+                    return;
+                }
+                
+                if (confirm('确定要删除所有科目吗？')) {
+                    clearInterval(subjectCountdownInterval);
+                    isRunning = false;
+                    isPaused = false;
+                    subjects = [];
+                    subjectName = '';
+                    totalTime = 0;
+                    timeLeft = 0;
+                    subjectCountdownName.textContent = '未设置';
+                    subjectCountdownTime.textContent = '00:00:00';
+                    subjectCountdownDisplay.textContent = '00:00:00';
+                    subjectCountdownStatus.textContent = '准备开始';
+                    subjectCountdownSection.classList.remove('active-timer');
+                    
+                    showStatus('已删除所有科目', 'success');
+                }
+            });
+            
+            startButton.addEventListener('click', startSubjectCountdown);
+            pauseButton.addEventListener('click', pauseSubjectCountdown);
+            resetButton.addEventListener('click', resetSubjectCountdown);
+        }
+        
+        // 初始化音乐播放器
+        function initMusicPlayer() {
+            const audioElement = document.getElementById('audio-element');
+            const videoElement = document.getElementById('video-element');
+            const videoPlayer = document.getElementById('video-player');
+            const playBtn = document.getElementById('play-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const repeatBtn = document.getElementById('repeat-btn');
+            const volumeBtn = document.getElementById('volume-btn');
+            const volumeSlider = document.getElementById('volume-slider');
+            const progressBar = document.getElementById('progress-bar');
+            const currentTimeDisplay = document.getElementById('current-time');
+            const durationDisplay = document.getElementById('duration');
+            const musicTitle = document.getElementById('music-title');
+            const playlist = document.getElementById('playlist');
+            const fileUpload = document.getElementById('file-upload');
+            const uploadStatus = document.getElementById('upload-status');
+            
+            let currentMedia = audioElement; // 当前使用的媒体元素
+            let isPlaying = false;
+            let currentTrackIndex = 0;
+            let mediaLibrary = []; // 存储所有媒体文件
+            let isRepeat = false; // 是否重复播放
+            
+            // 初始化播放列表
+            function initPlaylist() {
+                playlist.innerHTML = '';
+                
+                mediaLibrary.forEach((media, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'playlist-item';
+                    if (index === currentTrackIndex) {
+                        item.classList.add('active');
+                    }
+                    item.textContent = `${index + 1}. ${media.title}`;
+                    item.addEventListener('click', () => {
+                        playTrack(index);
+                    });
+                    playlist.appendChild(item);
+                });
+            }
+            
+            // 播放指定曲目
+            function playTrack(index) {
+                if (index < 0 || index >= mediaLibrary.length) return;
+                
+                currentTrackIndex = index;
+                const media = mediaLibrary[currentTrackIndex];
+                
+                // 更新播放列表活动项
+                const playlistItems = playlist.querySelectorAll('.playlist-item');
+                playlistItems.forEach((item, i) => {
+                    if (i === currentTrackIndex) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // 根据媒体类型设置播放器
+                if (media.type === 'audio') {
+                    videoPlayer.style.display = 'none';
+                    currentMedia = audioElement;
+                    videoElement.pause();
+                } else {
+                    videoPlayer.style.display = 'block';
+                    currentMedia = videoElement;
+                    audioElement.pause();
+                }
+                
+                currentMedia.src = media.url;
+                musicTitle.textContent = media.title;
+                
+                currentMedia.addEventListener('loadedmetadata', () => {
+                    durationDisplay.textContent = formatTime(currentMedia.duration);
+                });
+                
+                currentMedia.addEventListener('timeupdate', updateProgress);
+                currentMedia.addEventListener('ended', function() {
+                    if (!isRepeat) {
+                        nextTrack();
+                    } else {
+                        currentMedia.currentTime = 0;
+                        currentMedia.play();
+                    }
+                });
+                
+                currentMedia.play()
+                    .then(() => {
+                        isPlaying = true;
+                        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    })
+                    .catch(error => {
+                        showStatus('播放失败: ' + error, 'error');
+                    });
+            }
+            
+            // 更新进度条
+            function updateProgress() {
+                const progress = (currentMedia.currentTime / currentMedia.duration) * 100;
+                progressBar.style.width = `${progress}%`;
+                currentTimeDisplay.textContent = formatTime(currentMedia.currentTime);
+            }
+            
+            // 格式化时间 (秒 -> MM:SS)
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // 播放/暂停
+            function togglePlay() {
+                if (isPlaying) {
+                    currentMedia.pause();
+                    isPlaying = false;
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                } else {
+                    if (currentMedia.src) {
+                        currentMedia.play()
+                            .then(() => {
+                                isPlaying = true;
+                                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                            })
+                            .catch(error => {
+                                showStatus('播放失败: ' + error, 'error');
+                            });
+                    } else {
+                        playTrack(currentTrackIndex);
+                    }
+                }
+            }
+            
+            // 上一曲
+            function prevTrack() {
+                let newIndex = currentTrackIndex - 1;
+                if (newIndex < 0) {
+                    newIndex = mediaLibrary.length - 1;
+                }
+                playTrack(newIndex);
+            }
+            
+            // 下一曲
+            function nextTrack() {
+                let newIndex = currentTrackIndex + 1;
+                if (newIndex >= mediaLibrary.length) {
+                    newIndex = 0;
+                }
+                playTrack(newIndex);
+            }
+            
+            // 切换重复播放
+            function toggleRepeat() {
+                isRepeat = !isRepeat;
+                if (isRepeat) {
+                    repeatBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+                    repeatBtn.style.color = 'var(--dark-color)';
+                    showStatus('已开启重复播放', 'success');
+                } else {
+                    repeatBtn.style.background = '';
+                    repeatBtn.style.color = '';
+                    showStatus('已关闭重复播放', 'success');
+                }
+            }
+            
+            // 切换静音
+            function toggleMute() {
+                currentMedia.muted = !currentMedia.muted;
+                if (currentMedia.muted) {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            }
+            
+            // 设置音量
+            function setVolume() {
+                currentMedia.volume = volumeSlider.value;
+                if (currentMedia.volume == 0) {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                } else {
+                    volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+                }
+            }
+            
+            // 点击进度条跳转
+            progressBar.parentElement.addEventListener('click', (e) => {
+                const progressBarWidth = progressBar.parentElement.clientWidth;
+                const clickPosition = e.offsetX;
+                const duration = currentMedia.duration;
+                currentMedia.currentTime = (clickPosition / progressBarWidth) * duration;
+            });
+            
+            // 文件上传处理
+            fileUpload.addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (files.length === 0) return;
+                
+                uploadStatus.textContent = '上传中...';
+                uploadStatus.className = '';
+                
+                Array.from(files).forEach(file => {
+                    const fileType = file.type.split('/')[0]; // 'audio' 或 'video'
+                    const fileName = file.name.replace(/\.[^/.]+$/, ""); // 移除扩展名
+                    
+                    // 创建文件URL
+                    const fileURL = URL.createObjectURL(file);
+                    
+                    // 添加到媒体库
+                    mediaLibrary.push({
+                        title: fileName,
+                        src: file.name,
+                        url: fileURL,
+                        type: fileType
+                    });
+                    
+                    uploadStatus.textContent = `已添加: ${fileName}`;
+                    uploadStatus.className = 'success';
+                    
+                    // 如果是第一个文件，自动播放
+                    if (mediaLibrary.length === 1) {
+                        playTrack(0);
+                    }
+                    
+                    // 更新播放列表
+                    initPlaylist();
+                });
+                
+                // 重置文件输入
+                fileUpload.value = '';
+            });
+            
+            // 事件监听
+            playBtn.addEventListener('click', togglePlay);
+            prevBtn.addEventListener('click', prevTrack);
+            nextBtn.addEventListener('click', nextTrack);
+            repeatBtn.addEventListener('click', toggleRepeat);
+            volumeBtn.addEventListener('click', toggleMute);
+            volumeSlider.addEventListener('input', setVolume);
+            
+            // 初始化
+            setVolume();
+        }
+        
+        // 初始化云端储存
+        function initCloudStorage() {
+            const fileUpload = document.getElementById('file-storage-upload');
+            const fileCodeInput = document.getElementById('file-code-input');
+            const retrieveFileBtn = document.getElementById('retrieve-file-btn');
+            const repeatCloudBtn = document.getElementById('repeat-cloud-btn');
+            const cloudStorageGallery = document.getElementById('cloud-storage-gallery');
+            
+            // 模拟云端存储
+            let cloudFiles = {};
+            let isRepeat = false; // 是否重复播放
+            
+            // 上传文件
+            fileUpload.addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
+                
+                Array.from(files).forEach(file => {
+                    // 生成随机提取码 (6位数字字母组合)
+                    const code = generateRandomCode(6);
+                    
+                    // 创建文件URL
+                    const fileURL = URL.createObjectURL(file);
+                    
+                    // 存储文件信息
+                    cloudFiles[code] = {
+                        url: fileURL,
+                        name: file.name,
+                        type: file.type.split('/')[0], // 'image', 'video', 'audio', etc.
+                        size: file.size,
+                        date: new Date().toLocaleString()
+                    };
+                    
+                    // 显示上传的文件
+                    displayFileInGallery(code, fileURL, file.name, file.type);
+                    
+                    // 显示提取码给用户
+                    showStatus(`文件上传成功！提取码: ${code}`, 'success');
+                });
+                
+                // 重置文件输入
+                fileUpload.value = '';
+            });
+            
+            // 提取文件
+            retrieveFileBtn.addEventListener('click', function() {
+                const code = fileCodeInput.value.trim();
+                if (!code) {
+                    showStatus('请输入提取码', 'error');
+                    return;
+                }
+                
+                if (cloudFiles[code]) {
+                    // 显示文件
+                    displayFileInGallery(code, cloudFiles[code].url, cloudFiles[code].name, cloudFiles[code].type);
+                    fileCodeInput.value = '';
+                    showStatus('文件提取成功', 'success');
+                } else {
+                    showStatus('未找到匹配的文件，请检查提取码', 'error');
+                }
+            });
+            
+            // 切换重复播放
+            repeatCloudBtn.addEventListener('click', function() {
+                isRepeat = !isRepeat;
+                if (isRepeat) {
+                    repeatCloudBtn.style.background = 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))';
+                    repeatCloudBtn.style.color = 'var(--dark-color)';
+                    showStatus('已开启重复播放', 'success');
+                } else {
+                    repeatCloudBtn.style.background = '';
+                    repeatCloudBtn.style.color = '';
+                    showStatus('已关闭重复播放', 'success');
+                }
+            });
+            
+            // 在画廊中显示文件
+            function displayFileInGallery(code, url, name, type) {
+                // 检查是否已经显示
+                const existingItem = document.querySelector(`.cloud-storage-item[data-code="${code}"]`);
+                if (existingItem) return;
+                
+                const item = document.createElement('div');
+                item.className = 'cloud-storage-item';
+                item.dataset.code = code;
+                
+                let previewElement;
+                
+                if (type.startsWith('image/')) {
+                    previewElement = document.createElement('img');
+                    previewElement.className = 'cloud-storage-img';
+                    previewElement.src = url;
+                } else if (type.startsWith('video/')) {
+                    previewElement = document.createElement('video');
+                    previewElement.className = 'cloud-storage-img';
+                    previewElement.src = url;
+                    previewElement.controls = true;
+                    if (isRepeat) {
+                        previewElement.loop = true;
+                    }
+                } else if (type.startsWith('audio/')) {
+                    previewElement = document.createElement('audio');
+                    previewElement.className = 'cloud-storage-img';
+                    previewElement.src = url;
+                    previewElement.controls = true;
+                    if (isRepeat) {
+                        previewElement.loop = true;
+                    }
+                } else {
+                    // 其他类型文件显示文件图标
+                    previewElement = document.createElement('div');
+                    previewElement.className = 'cloud-storage-img';
+                    previewElement.style.display = 'flex';
+                    previewElement.style.alignItems = 'center';
+                    previewElement.style.justifyContent = 'center';
+                    previewElement.style.backgroundColor = 'rgba(0, 242, 254, 0.1)';
+                    
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-file';
+                    icon.style.fontSize = '3em';
+                    icon.style.color = 'var(--primary-color)';
+                    
+                    previewElement.appendChild(icon);
+                }
+                
+                previewElement.alt = name;
+                
+                const codeSpan = document.createElement('div');
+                codeSpan.className = 'cloud-storage-code';
+                codeSpan.textContent = `提取码: ${code}`;
+                
+                item.appendChild(previewElement);
+                item.appendChild(codeSpan);
+                cloudStorageGallery.appendChild(item);
+                
+                // 点击文件查看大图或播放
+                item.addEventListener('click', function() {
+                    if (type.startsWith('image/')) {
+                        const viewer = document.getElementById('fullscreen-image-viewer');
+                        const viewerImg = viewer.querySelector('.fullscreen-image');
+                        viewerImg.src = url;
+                        viewerImg.alt = name;
+                        viewer.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            }
+            
+            // 生成随机提取码
+            function generateRandomCode(length) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+        }
+        
+        // 初始化唯一网址
+        function initUniqueUrl() {
+            const uniqueUrlElement = document.getElementById('unique-url');
+            const copyUrlBtn = document.getElementById('copy-url-btn');
+            
+            // 生成唯一URL (使用当前时间戳和随机字符串)
+            const timestamp = Date.now();
+            const randomStr = Math.random().toString(36).substring(2, 8);
+            const uniqueUrl = `${window.location.origin}${window.location.pathname}?id=${timestamp}-${randomStr}`;
+            
+            // 显示URL
+            uniqueUrlElement.textContent = uniqueUrl;
+            
+            // 复制URL
+            copyUrlBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(uniqueUrl).then(() => {
+                    showStatus('已复制网址到剪贴板', 'success');
+                }).catch(err => {
+                    showStatus('复制失败: ' + err, 'error');
+                });
+            });
+        }
+        
+        // 初始化科技强国按钮
+        function initTechButtons() {
+            // 单开按钮
+            document.getElementById('single-open').addEventListener('click', function() {
+                showStatus('正在单开DeepSeek Chat...', 'success');
+                window.open('https://chat.deepseek.com/', '_blank');
+            });
+            
+            // 双开按钮
+            document.getElementById('double-open').addEventListener('click', function() {
+                showStatus('正在双开DeepSeek Chat和通义千问...', 'success');
+                window.open('https://chat.deepseek.com/', '_blank');
+                setTimeout(() => {
+                    window.open('https://tongyi.aliyun.com/qianwen/', '_blank');
+                }, 300);
+            });
+            
+            // 三开按钮
+            document.getElementById('triple-open').addEventListener('click', function() {
+                showStatus('正在三开DeepSeek Chat、通义千问和豆包...', 'success');
+                window.open('https://chat.deepseek.com/', '_blank');
+                setTimeout(() => {
+                    window.open('https://tongyi.aliyun.com/qianwen/', '_blank');
+                }, 300);
+                setTimeout(() => {
+                    window.open('https://www.doubao.com/chat/', '_blank');
+                }, 600);
+            });
+            
+            // 五开按钮
+            document.getElementById('quintuple-open').addEventListener('click', function() {
+                showStatus('正在五开多个AI聊天平台...', 'success');
+                window.open('https://chat.deepseek.com/', '_blank');
+                setTimeout(() => {
+                    window.open('https://tongyi.aliyun.com/qianwen/', '_blank');
+                }, 300);
+                setTimeout(() => {
+                    window.open('https://www.doubao.com/chat/', '_blank');
+                }, 600);
+                setTimeout(() => {
+                    window.open('https://bot.n.cn/chat?src=dh_bj', '_blank');
+                }, 900);
+                setTimeout(() => {
+                    window.open('https://kimi.moonshot.cn/', '_blank');
+                }, 1200);
+            });
+        }
+        
+            // 遥遥领先
+            document.getElementById('yaoyao-toggle').addEventListener('change', function() {
+                     if(this.checked) {
+                         const modal = document.getElementById('yaoyao-modal');
+                         const audio = document.getElementById('yaoyao-audio');
+                         audio.src = '遥遥领先.mp3';
+                         modal.style.display = 'flex';
+        
+                         audio.play().catch(e => {
+                                showStatus('播放失败: ' + e.message, 'error');
+                                this.checked = false;
+                    });
+                }
+            });
+
+            document.getElementById('stop-yaoyao-btn').addEventListener('click', function() {
+                     const audio = document.getElementById('yaoyao-audio');
+                     audio.pause();
+                     audio.currentTime = 0;
+                     document.getElementById('yaoyao-modal').style.display = 'none';
+                     document.getElementById('yaoyao-toggle').checked = false;
+            });
+
+        // 初始化DeepSeek常用语言
+        function initDeepSeekSection() {
+            // 复制功能
+            document.querySelectorAll('.deepseek-copy-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const textToCopy = this.getAttribute('data-text');
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showStatus('已复制到剪贴板: ' + textToCopy, 'success');
+                    }).catch(err => {
+                        showStatus('复制失败: ' + err, 'error');
+                    });
+                });
+            });
+            
+            // 添加新项
+            document.getElementById('add-deepseek-btn').addEventListener('click', function() {
+                const container = document.getElementById('deepseek-items-container');
+                const itemCount = container.children.length + 1;
+                const newItem = document.createElement('div');
+                newItem.className = 'deepseek-item';
+                newItem.innerHTML = `
+                    <span>${itemCount}. <input type="text" class="new-deepseek-input" placeholder="输入新的DeepSeek指令"></span>
+                    <button class="deepseek-copy-btn"><i class="far fa-copy"></i> 复制</button>
+                `;
+                container.appendChild(newItem);
+                
+                // 为新的输入框添加事件监听
+                const input = newItem.querySelector('.new-deepseek-input');
+                const copyBtn = newItem.querySelector('.deepseek-copy-btn');
+                
+                input.addEventListener('change', function() {
+                    copyBtn.setAttribute('data-text', this.value);
+                });
+                
+                copyBtn.addEventListener('click', function() {
+                    const textToCopy = input.value;
+                    if (textToCopy) {
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            showStatus('已复制到剪贴板: ' + textToCopy, 'success');
+                        }).catch(err => {
+                            showStatus('复制失败: ' + err, 'error');
+                        });
+                    } else {
+                        showStatus('请输入要复制的内容', 'error');
+                    }
+                });
+            });
+        }
+        
+        // 初始化科目时间保存功能
+        function initSubjectTime() {
+            const saveSubjectBtn = document.getElementById('save-subject-btn');
+            const downloadSubjectBtn = document.getElementById('download-subject-btn');
+            const subjectModal = document.getElementById('subject-modal');
+            const subjectNameInput = document.getElementById('subject-name-input');
+            const confirmSubjectBtn = document.getElementById('confirm-subject-btn');
+            const cancelSubjectBtn = document.getElementById('cancel-subject-btn');
+            
+            let subjectTimeData = [];
+            let currentSeconds = 0;
+            
+            // 显示科目名称输入弹窗
+            saveSubjectBtn.addEventListener('click', function() {
+                currentSeconds = parseInt(document.getElementById('stopwatch-display').textContent.split(':').reduce((acc, time) => (60 * acc) + +time, 0));
+                subjectModal.style.display = 'flex';
+                subjectNameInput.focus();
+            });
+            
+            // 确认保存科目时间
+            confirmSubjectBtn.addEventListener('click', function() {
+                const subjectName = subjectNameInput.value.trim();
+                if (!subjectName) {
+                    showStatus('请输入科目名称', 'error');
+                    return;
+                }
+                
+                const now = new Date();
+                const dateString = `${now.getFullYear()}年${(now.getMonth()+1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日`;
+                const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+                
+                const hours = Math.floor(currentSeconds / 3600);
+                const minutes = Math.floor((currentSeconds % 3600) / 60);
+                const secs = currentSeconds % 60;
+                const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                subjectTimeData.push({
+                    subject: subjectName,
+                    time: formattedTime,
+                    recordTime: `${dateString} ${timeString}`
+                });
+                
+                subjectNameInput.value = '';
+                subjectModal.style.display = 'none';
+                
+                showStatus(`已保存科目 "${subjectName}" 的时间: ${formattedTime}`, 'success');
+            });
+            
+            // 取消保存
+            cancelSubjectBtn.addEventListener('click', function() {
+                subjectNameInput.value = '';
+                subjectModal.style.display = 'none';
+            });
+            
+            // 下载科目时间数据
+            downloadSubjectBtn.addEventListener('click', function() {
+                if (subjectTimeData.length === 0) {
+                    showStatus('没有可下载的科目时间数据', 'error');
+                    return;
+                }
+                
+                const now = new Date();
+                const dateString = `${now.getFullYear()}年${(now.getMonth()+1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日`;
+                const fileName = `科目时间记录_${dateString}.txt`;
+                
+                let content = '科目时间记录:\n\n';
+                subjectTimeData.forEach(item => {
+                    content += `科目: ${item.subject}\n`;
+                    content += `用时: ${item.time}\n`;
+                    content += `记录时间: ${item.recordTime}\n\n`;
+                });
+                
+                // 创建Blob对象
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    // 下载后初始化正计时提取(科目排版)
+                    subjectTimeData = []; // 清空数据
+                    document.getElementById('stopwatch-display').textContent = '00:00:00';
+                    document.getElementById('stopwatch-status').textContent = '准备开始';
+                    showStatus('已下载并重置科目时间记录', 'success');
+                }, 100);
+            });
+        }
+        
+        // 初始化开发者模式
+        function initDeveloperMode() {
+            const developerLink = document.getElementById('developer-link');
+            const developerModal = document.getElementById('developer-modal');
+            const developerPassword = document.getElementById('developer-password');
+            const confirmDeveloperBtn = document.getElementById('confirm-developer-btn');
+            const cancelDeveloperBtn = document.getElementById('cancel-developer-btn');
+            const developerPanel = document.getElementById('developer-panel');
+            const forceDayType = document.getElementById('force-day-type');
+            const workStatusSelect = document.getElementById('work-status-select');
+            const extractToggle = document.getElementById('stopwatch-extract-toggle');
+            const subjectExtractToggle = document.getElementById('subject-extract-toggle');
+            const techToggle = document.getElementById('tech-section-toggle');
+            const musicToggle = document.getElementById('toggle-music-section');
+            const cloudStorageToggle = document.getElementById('toggle-cloud-storage-section');
+            const uniqueUrlToggle = document.getElementById('toggle-unique-url-section');
+            const stopButton = document.getElementById('stop-stopwatch');
+            const subjectButtons = document.getElementById('subject-buttons');
+            const techSection = document.getElementById('tech-section');
+            const deepseekSection = document.getElementById('deepseek-section');
+            const musicSection = document.getElementById('music-section');
+            const cloudStorageSection = document.getElementById('cloud-storage-section');
+            const uniqueUrlSection = document.getElementById('unique-url-section');
+            const techModeToggle = document.getElementById('tech-mode-toggle');
+            
+            // 开发者密码
+            const correctPassword = 'xian0615';
+            
+            // 点击开发者链接
+            developerLink.addEventListener('click', function() {
+                developerModal.style.display = 'flex';
+                developerPassword.focus();
+            });
+            
+            // 确认开发者密码
+            confirmDeveloperBtn.addEventListener('click', function() {
+                const password = developerPassword.value.trim();
+                if (password === correctPassword) {
+                    developerModal.style.display = 'none';
+                    developerPanel.style.display = 'block';
+                    showStatus('已进入开发者模式', 'success');
+                } else {
+                    showStatus('密码错误', 'error');
+                }
+                developerPassword.value = '';
+            });
+            
+            // 取消开发者密码输入
+            cancelDeveloperBtn.addEventListener('click', function() {
+                developerModal.style.display = 'none';
+                developerPassword.value = '';
+            });
+            
+            // 强制设置日期类型变化
+            forceDayType.addEventListener('change', function() {
+                updateBeijingTime();
+            });
+            
+            // 工作状态选择变化
+            workStatusSelect.addEventListener('change', function() {
+                updateWorkStatus();
+            });
+            
+            // 正计时提取功能开关
+            extractToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    stopButton.style.display = 'inline-block';
+                    showStatus('已开启正计时提取功能', 'success');
+                } else {
+                    stopButton.style.display = 'none';
+                    showStatus('已关闭正计时提取功能', 'success');
+                }
+            });
+            
+            // 正计时提取(科目排版)开关
+            subjectExtractToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    subjectButtons.style.display = 'flex';
+                    showStatus('已开启正计时提取(科目排版)功能', 'success');
+                } else {
+                    subjectButtons.style.display = 'none';
+                    showStatus('已关闭正计时提取(科目排版)功能', 'success');
+                }
+            });
+            
+            // 科技强国栏目开关
+            techToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    techSection.style.display = 'block';
+                    deepseekSection.style.display = 'block';
+                    showStatus('已显示科技强国栏目和DeepSeek常用语言', 'success');
+                } else {
+                    techSection.style.display = 'none';
+                    deepseekSection.style.display = 'none';
+                    showStatus('已隐藏科技强国栏目和DeepSeek常用语言', 'success');
+                }
+            });
+            
+            // 音乐播放器开关
+            musicToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    musicSection.style.display = 'block';
+                    showStatus('已显示音乐播放器', 'success');
+                } else {
+                    musicSection.style.display = 'none';
+                    showStatus('已隐藏音乐播放器', 'success');
+                }
+            });
+            
+            // 云端储存开关
+            cloudStorageToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    cloudStorageSection.style.display = 'block';
+                    showStatus('已显示云端储存', 'success');
+                } else {
+                    cloudStorageSection.style.display = 'none';
+                    showStatus('已隐藏云端储存', 'success');
+                }
+            });
+            
+           // 唯一网址开关
+            uniqueUrlToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    uniqueUrlSection.style.display = 'block';
+                    showStatus('已显示唯一网址', 'success');
+                } else {
+                    uniqueUrlSection.style.display = 'none';
+                    showStatus('已隐藏唯一网址', 'success');
+                }
+            });
+
+           // 科技强国模式开关
+            techModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.classList.add('tech-mode');
+                    showStatus('已启用科技强国模式', 'success');
+                } else {
+                    document.body.classList.remove('tech-mode');
+                    showStatus('已关闭科技强国模式', 'success');
+                }
+            });
+
+            
+            // 控制各栏目显示/隐藏
+            document.getElementById('toggle-tomato-section').addEventListener('change', function() {
+                document.getElementById('tomato-section').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            document.getElementById('toggle-countdown-section').addEventListener('change', function() {
+                document.getElementById('countdown-section').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            document.getElementById('toggle-stopwatch-section').addEventListener('change', function() {
+                document.getElementById('stopwatch-section').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            document.getElementById('toggle-schedule-section').addEventListener('change', function() {
+                document.getElementById('schedule-section').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            document.getElementById('toggle-subject-countdown-section').addEventListener('change', function() {
+                document.getElementById('subject-countdown-section').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            document.getElementById('toggle-tech-section').addEventListener('change', function() {
+                document.getElementById('tech-section').style.display = this.checked ? 'block' : 'none';
+                document.getElementById('tech-section-toggle').checked = this.checked;
+            });
+            
+            document.getElementById('toggle-deepseek-section').addEventListener('change', function() {
+                document.getElementById('deepseek-section').style.display = this.checked ? 'block' : 'none';
+                document.getElementById('tech-section-toggle').checked = this.checked;
+            });
+            
+            // 初始化工作状态显示
+            updateWorkStatus();
+        }
+        
+        // 初始化作业负担分析
+        function initHomeworkAnalysis() {
+            // 为所有科目初始化输入框切换功能
+            const subjects = ['chinese', 'math', 'english', 'biology', 'geography', 'ethics', 'history'];
+            const taskTypes = ['workbook', 'test', 'other'];
+            
+            subjects.forEach(subject => {
+                taskTypes.forEach(taskType => {
+                    const toggle = document.querySelector(`.subject-row[data-subject="${subject}"] .task-toggle[onchange*="${subject}-${taskType}"]`);
+                    const input = document.getElementById(`${subject}-${taskType}-input`);
+                    const difficulty = document.getElementById(`${subject}-${taskType}-difficulty`);
+                    
+                    toggle.addEventListener('change', function() {
+                        if (this.value === 'yes') {
+                            input.style.display = 'inline-block';
+                            difficulty.style.display = 'inline-block';
+                            input.focus();
+                        } else {
+                            input.style.display = 'none';
+                            difficulty.style.display = 'none';
+                            input.value = '';
+                        }
+                    });
+                });
+            });
+            
+            // 科技模式按钮
+            const techModeBtn = document.getElementById('tech-mode-btn');
+            techModeBtn.addEventListener('click', function() {
+                // 启用科技模式
+                document.body.classList.add('tech-mode');
+                
+                // 自动打开开发者模式的所有选项
+                const allToggles = document.querySelectorAll('.developer-panel input[type="checkbox"]');
+                allToggles.forEach(toggle => {
+                    toggle.checked = true;
+                    const event = new Event('change');
+                    toggle.dispatchEvent(event);
+                });
+                
+                // 设置日期类型为科技日
+                document.getElementById('force-day-type').value = 'techday';
+                updateBeijingTime();
+                
+                // 设置工作状态为工作中
+                document.getElementById('work-status-select').value = 'working';
+                updateWorkStatus();
+                
+                // 显示科技强国栏目
+                document.getElementById('tech-section').style.display = 'block';
+                
+                showStatus('已启用科技强国模式！', 'success');
+            });
+            
+            // 表情包按钮
+            document.getElementById('meme-btn').addEventListener('click', function() {
+                     const viewer = document.getElementById('fullscreen-image-viewer');
+                     const viewerImg = viewer.querySelector('.fullscreen-image');
+                     viewerImg.src = '表情包.jpg';
+                     viewer.style.display = 'flex';
+            });
+        }
+        
+        // 切换任务输入框显示/隐藏
+        function toggleTaskInput(selectElement, inputId) {
+            const input = document.getElementById(`${inputId}-input`);
+            const difficulty = document.getElementById(`${inputId}-difficulty`);
+            if (selectElement.value === 'yes') {
+                input.style.display = 'inline-block';
+                difficulty.style.display = 'inline-block';
+                input.focus();
+            } else {
+                input.style.display = 'none';
+                difficulty.style.display = 'none';
+                input.value = '';
+            }
+        }
+        
+        // 计算作业负担
+        function calculateHomeworkBurden() {
+            const subjects = ['chinese', 'math', 'english', 'biology', 'geography', 'ethics', 'history'];
+            const taskTypes = ['workbook', 'test', 'other'];
+            
+            let totalScore = 0;
+            let subjectCount = 0;
+            
+            // 计算每个科目的负担分数
+            subjects.forEach(subject => {
+                let subjectScore = 0;
+                let hasTask = false;
+                
+                // 练习册页数
+                const workbookToggle = document.querySelector(`.subject-row[data-subject="${subject}"] .task-toggle[onchange*="${subject}-workbook"]`);
+                if (workbookToggle.value === 'yes') {
+                    const workbookInput = document.getElementById(`${subject}-workbook-input`);
+                    const workbookDifficulty = document.getElementById(`${subject}-workbook-difficulty`);
+                    const pages = parseInt(workbookInput.value) || 0;
+                    const difficulty = parseInt(workbookDifficulty.value) || 1;
+                    if (pages > 0) {
+                        subjectScore += pages * 0.5 * difficulty; // 每页0.5分乘以难度系数
+                        hasTask = true;
+                    }
+                }
+                
+                // 试卷卷数
+                const testToggle = document.querySelector(`.subject-row[data-subject="${subject}"] .task-toggle[onchange*="${subject}-test"]`);
+                if (testToggle.value === 'yes') {
+                    const testInput = document.getElementById(`${subject}-test-input`);
+                    const testDifficulty = document.getElementById(`${subject}-test-difficulty`);
+                    const tests = parseInt(testInput.value) || 0;
+                    const difficulty = parseInt(testDifficulty.value) || 1;
+                    if (tests > 0) {
+                        subjectScore += tests * 5 * difficulty; // 每卷5分乘以难度系数
+                        hasTask = true;
+                    }
+                }
+                
+                // 其他作业
+                const otherToggle = document.querySelector(`.subject-row[data-subject="${subject}"] .task-toggle[onchange*="${subject}-other"]`);
+                if (otherToggle.value === 'yes') {
+                    const otherInput = document.getElementById(`${subject}-other-input`);
+                    const otherDifficulty = document.getElementById(`${subject}-other-difficulty`);
+                    const otherText = otherInput.value.trim();
+                    const difficulty = parseInt(otherDifficulty.value) || 1;
+                    if (otherText) {
+                        // 根据其他作业的文字长度评估负担
+                        subjectScore += Math.min(otherText.length / 10, 10) * difficulty; // 最多10分乘以难度系数
+                        hasTask = true;
+                    }
+                }
+                
+                if (hasTask) {
+                    totalScore += subjectScore;
+                    subjectCount++;
+                }
+            });
+            
+            // 计算平均负担分数
+            const averageScore = subjectCount > 0 ? totalScore / subjectCount : 0;
+            
+            // 显示进度条
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const resultContainer = document.getElementById('result-container');
+            const resultFace = document.getElementById('result-face');
+            const resultText = document.getElementById('result-text');
+            const techModeBtn = document.getElementById('tech-mode-btn');
+            const memeBtn = document.getElementById('meme-btn');
+            
+            progressContainer.style.display = 'block';
+            resultContainer.style.display = 'block';
+            
+            // 动画显示进度
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 1;
+                progressBar.style.width = `${Math.min(progress, averageScore * 10)}%`;
+                progressBar.textContent = `${Math.min(progress, averageScore * 10)}%`;
+                
+                if (progress >= averageScore * 10) {
+                    clearInterval(interval);
+                    
+                    // 根据分数显示结果
+                    if (averageScore < 2) { // 调整为2分以下为轻
+                        resultFace.innerHTML = '😊';
+                        resultFace.className = 'result-face green-face';
+                        resultText.textContent = '当前作业负担较轻，继续加油。';
+                        techModeBtn.style.display = 'none';
+                        memeBtn.style.display = 'none';
+                        alert('当前作业负担较轻，继续加油。');
+                    } else if (averageScore < 4) { // 调整为4分以下为较重
+                        resultFace.innerHTML = '😐';
+                        resultFace.className = 'result-face yellow-face';
+                        resultText.textContent = '当前作业负担较重，继续加油可以稍微使用科技。';
+                        techModeBtn.style.display = 'none';
+                        memeBtn.style.display = 'none';
+                        alert('当前作业负担较重，继续加油可以稍微使用科技。');
+                    } else if (averageScore < 6) { // 调整为6分以下为重
+                        resultFace.innerHTML = '😫';
+                        resultFace.className = 'result-face red-face';
+                        resultText.textContent = '当前作业负担重，建议不用写了，可以直接打开科技强国模式！';
+                        techModeBtn.style.display = 'block';
+                        alert('当前作业负担重，建议不用写了，可以直接打开科技强国模式！');
+                    }
+                }
+            }, 30);
+        }
+        
+        // 显示状态信息
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('status-message');
+            statusElement.textContent = message;
+            statusElement.className = type;
+            setTimeout(() => {
+                statusElement.textContent = '';
+                statusElement.className = '';
+            }, 3000);
+        }
+    </script>
+    <!-- 引入SortableJS库用于拖拽排序 -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+</body>
+</html>

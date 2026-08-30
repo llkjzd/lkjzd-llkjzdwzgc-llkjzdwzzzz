@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老六假期作业负担智能统计系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+            transition: all 0.5s ease;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        /* 默认主题 - 4种渐变色 */
+        body.default-theme {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e2e8f0 33%, #cbd5e0 66%, #a0aec0 100%);
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+        }
+        
+        /* 暑假主题 - 4种渐变色 */
+        body.summer-theme {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 33%, #ff9a9e 66%, #fbc2eb 100%);
+            --primary-color: #ff9800;
+            --secondary-color: #ffc107;
+            --accent-color: #f44336;
+            --light-bg: #fff9c4;
+            --dark-text: #212121;
+        }
+        
+        /* 寒假主题 - 4种渐变色 */
+        body.winter-theme {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 33%, #80deea 66%, #4dd0e1 100%);
+            --primary-color: #2196f3;
+            --secondary-color: #64b5f6;
+            --accent-color: #f44336;
+            --light-bg: #e3f2fd;
+            --dark-text: #212121;
+        }
+        
+        /* 节日主题 - 4种渐变色 */
+        body.festival-theme {
+            background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 33%, #e57373 66%, #ef5350 100%);
+            --primary-color: #f44336;
+            --secondary-color: #e57373;
+            --accent-color: #d32f2f;
+            --light-bg: #ffebee;
+            --dark-text: #212121;
+        }
+        
+        /* 太阳效果 */
+        .sun-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+        
+        .sun {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #ffeb3b 30%, #ffc107 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px #ffeb3b;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 10px rgba(255, 235, 59, 0.7));
+        }
+        
+        .sun-ray {
+            position: absolute;
+            width: 80px;
+            height: 8px;
+            background: linear-gradient(90deg, rgba(255,235,59,0.3), rgba(255,235,59,0.8), rgba(255,235,59,0.3));
+            border-radius: 4px;
+            top: 21px;
+            left: 50px;
+            transform-origin: 0 50%;
+            animation: sunRayPulse 3s ease-in-out infinite;
+        }
+        
+        /* 雪花效果 */
+        .snowflake {
+            position: fixed;
+            color: #e3f2fd;
+            font-size: 1.2rem;
+            user-select: none;
+            z-index: -1;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+            animation: snowFall linear forwards;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header .lead {
+            opacity: 0.9;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #ddd;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.25);
+            background-color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-success:hover {
+            background-color: #e6ac00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .subject-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .badge-difficulty {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+        
+        .badge-easy {
+            background-color: #2ecc71;
+        }
+        
+        .badge-medium {
+            background-color: #f39c12;
+        }
+        
+        .badge-hard {
+            background-color: #e74c3c;
+        }
+        
+        .report-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-header {
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .report-footer {
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 1rem;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 2rem 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .export-buttons {
+            margin-top: 1.5rem;
+        }
+        
+        .subject-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .holiday-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .floating-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .progress-thin {
+            height: 8px;
+        }
+        
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1050;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .notification-close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 250px;
+            padding: 15px;
+            background-color: white;
+            color: var(--dark-text);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1050;
+            animation: slideIn 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .toast-notification .icon-status {
+            margin-left: 10px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        /* 白名单黑名单样式 */
+        .list-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 2rem;
+        }
+        
+        .list-box {
+            flex: 1;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .white-list {
+            border: 1px solid #b7eb8f;
+        }
+        
+        .black-list {
+            border: 1px solid #ffccc7;
+        }
+        
+        .list-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .list-title i {
+            margin-right: 8px;
+        }
+        
+        .list-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .white-list .list-item {
+            border-left: 4px solid #52c41a;
+        }
+        
+        .black-list .list-item {
+            border-left: 4px solid #f5222d;
+        }
+        
+        /* 开发者模式按钮 */
+        .dev-mode-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 2000;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .dev-mode-btn:hover {
+            background-color: rgba(0, 0, 0, 0.5);
+            transform: scale(1.1);
+        }
+        
+        /* 开发者模式弹窗 */
+        .dev-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        
+        .dev-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dev-modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-text);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .dev-modal-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .dev-form-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .dev-form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .dev-form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .dev-form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+        
+        .dev-checkbox-group {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+        
+        .dev-checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
+        .dev-checkbox-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dev-checkbox-label {
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .dev-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .dev-modal-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .dev-modal-btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        
+        .dev-modal-btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dev-modal-btn-secondary {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #495057;
+        }
+        
+        .dev-modal-btn-secondary:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 密码输入弹窗 */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+        
+        .password-modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .password-modal-title {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-modal-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .password-input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .password-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            outline: none;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+        }
+        
+        .password-modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+        
+        /* 重点科目标记 */
+        .subject-important {
+            color: #e74c3c;
+            margin-left: 5px;
+        }
+        
+        /* 水印样式 */
+        .watermark {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            color: #3498db;
+            font-size: 12px;
+            text-align: right;
+            line-height: 1.5;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        @keyframes sunRayPulse {
+            0% { opacity: 0.5; transform: scaleX(0.8); }
+            50% { opacity: 1; transform: scaleX(1); }
+            100% { opacity: 0.5; transform: scaleX(0.8); }
+        }
+        
+        @keyframes snowFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1.5rem 0;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .list-container {
+                flex-direction: column;
+            }
+            
+            .sun-container {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .sun {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .sun-ray {
+                width: 60px;
+                height: 6px;
+                top: 17px;
+            }
+            
+            .dev-modal-content {
+                padding: 1rem;
+            }
+            
+            .dev-checkbox-group {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            
+            .watermark {
+                font-size: 10px;
+                right: 10px;
+                bottom: 10px;
+            }
+            
+            .floating-btn {
+                left: 1rem;
+                bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="default-theme">
+    <!-- 水印 -->
+    <div class="watermark">
+        老六系列产品<br>
+        版本号：23.8.7<br>
+        © 归星皓版权所有
+    </div>
+
+    <!-- 开发者模式按钮 -->
+    <button class="dev-mode-btn" id="dev-mode-btn" title="开发者模式">
+        <i class="bi bi-code-slash"></i>
+    </button>
+
+    <!-- 密码输入弹窗 -->
+    <div class="password-modal" id="password-modal">
+        <div class="password-modal-content">
+            <div class="password-modal-title">
+                <i class="bi bi-lock-fill"></i> 开发者密码验证
+            </div>
+            
+            <div class="password-input-group">
+                <input type="password" class="password-input" id="dev-password" placeholder="请输入开发者密码">
+                <button class="password-toggle" id="toggle-password">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            
+            <div class="password-modal-buttons">
+                <button class="dev-modal-btn dev-modal-btn-secondary" id="password-cancel">
+                    <i class="bi bi-x-circle"></i> 取消
+                </button>
+                <button class="dev-modal-btn dev-modal-btn-primary" id="password-confirm">
+                    <i class="bi bi-check-circle"></i> 确认
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 开发者模式弹窗 -->
+    <div class="dev-modal" id="dev-modal">
+        <div class="dev-modal-content">
+            <div class="dev-modal-title">
+                <i class="bi bi-gear-fill"></i> 开发者模式设置
+            </div>
+            
+            <div class="dev-form-group">
+                <label class="dev-form-label">1. 自定义平均负担值</label>
+                <input type="number" class="dev-form-control" id="custom-average-burden" placeholder="留空则使用自动计算值">
+                <small class="text-muted">设置一个固定值作为负担分界线，高于此值的科目将被列入黑名单</small>
+            </div>
+            
+            <div class="dev-form-group">
+                <label class="dev-form-label">2. 强制设置名单</label>
+                <div class="dev-checkbox-group">
+                    <label class="dev-form-label">白名单科目 (负担良好)</label>
+                    <div id="force-white-list"></div>
+                    
+                    <label class="dev-form-label" style="margin-top: 1rem;">黑名单科目 (负担过重)</label>
+                    <div id="force-black-list"></div>
+                </div>
+                <small class="text-muted">强制将特定科目加入白名单或黑名单，覆盖自动计算结果</small>
+            </div>
+            
+            <div class="dev-form-group">
+                <label class="dev-form-label">3. 设置重点科目</label>
+                <div class="dev-checkbox-group" id="important-subjects"></div>
+                <small class="text-muted">标记为重点的科目将在报告中显示特殊标识</small>
+            </div>
+            
+            <div class="dev-modal-buttons">
+                <button class="dev-modal-btn dev-modal-btn-secondary" id="dev-modal-cancel">
+                    <i class="bi bi-x-lg"></i> 取消
+                </button>
+                <button class="dev-modal-btn dev-modal-btn-primary" id="dev-modal-save">
+                    <i class="bi bi-save"></i> 保存设置
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 太阳效果容器 -->
+    <div class="sun-container" id="sun-container">
+        <div class="sun"></div>
+        <div class="sun-ray"></div>
+    </div>
+
+    <div class="header text-center">
+        <div class="container">
+            <h1 class="display-5"><i class="bi bi-journal-bookmark-fill"></i> 老六假期作业负担智能统计系统</h1>
+            <p class="lead">精准分析作业负担，科学规划学习时间</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-calendar3 holiday-icon"></i>假期信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="holiday-type" class="form-label">选择假期类型</label>
+                                    <select class="form-select" id="holiday-type">
+                                        <option value="">--请选择假期类型--</option>
+                                        <option value="date"><i class="bi bi-calendar-range"></i> 日期</option>
+                                        <option value="festival"><i class="bi bi-balloon"></i> 节日</option>
+                                        <option value="summer"><i class="bi bi-sun"></i> 暑假</option>
+                                        <option value="winter"><i class="bi bi-snow"></i> 寒假</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="date-input" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="start-date" class="form-label">开始日期</label>
+                                    <input type="date" class="form-control" id="start-date">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="end-date" class="form-label">截止日期</label>
+                                    <input type="date" class="form-control" id="end-date">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="festival-input" style="display: none;">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="festival-name" class="form-label">节日名称</label>
+                                    <input type="text" class="form-control" id="festival-name" placeholder="例如：国庆节、春节等">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="festival-days" class="form-label">假期天数</label>
+                                    <input type="number" min="1" class="form-control" id="festival-days" placeholder="请输入假期天数">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="bi bi-journal-text"></i> 科目作业信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="subjects-container">
+                            <!-- 科目将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4 mb-5">
+                    <button id="generate-report" class="btn btn-primary btn-lg">
+                        <i class="bi bi-file-earmark-bar-graph"></i> 生成智能报告
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="report-section" style="display: none;">
+            <div class="col-lg-10 mx-auto">
+                <div class="report-card" id="report">
+                    <div class="report-header text-center">
+                        <h2><i class="bi bi-award"></i> 假期作业负担智能报告认定书</h2>
+                        <p class="text-muted" id="report-holiday-info"></p>
+                    </div>
+                    
+                    <div id="report-content">
+                        <!-- 报告内容将通过JavaScript动态生成 -->
+                    </div>
+                    
+                    <div id="list-section" style="display: none;">
+                        <div class="list-container">
+                            <div class="list-box white-list">
+                                <h4 class="list-title"><i class="bi bi-check-circle-fill text-success"></i> 白名单 (负担良好)</h4>
+                                <div id="white-list-items"></div>
+                            </div>
+                            <div class="list-box black-list">
+                                <h4 class="list-title"><i class="bi bi-exclamation-circle-fill text-danger"></i> 黑名单 (负担过重)</h4>
+                                <div id="black-list-items"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="export-buttons text-center">
+                        <button id="save-pdf" class="btn btn-danger me-2">
+                            <i class="bi bi-file-pdf"></i> 保存为PDF
+                        </button>
+                        <button id="save-image" class="btn btn-success me-2">
+                            <i class="bi bi-file-image"></i> 保存为图片
+                        </button>
+                        <button id="save-html" class="btn btn-primary">
+                            <i class="bi bi-file-earmark-code"></i> 保存为HTML
+                        </button>
+                    </div>
+                    
+                    <div class="report-footer text-end">
+                        <div id="report-date"></div>
+                        <div>老六终端运营智能生成</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="back-to-top" class="btn btn-primary rounded-circle floating-btn" style="display: none;">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <script>
+        // 科目列表与对应图标 - 新增物理学科
+        const subjects = [
+            { id: 'chinese', name: '语文', icon: 'bi bi-pen' },
+            { id: 'math', name: '数学', icon: 'bi bi-calculator' },
+            { id: 'english', name: '英语', icon: 'bi bi-translate' },
+            { id: 'physics', name: '物理', icon: 'bi bi-lightning-charge' }, // 新增物理学科
+            { id: 'biology', name: '生物', icon: 'bi bi-flower1' },
+            { id: 'geography', name: '地理', icon: 'bi bi-globe' },
+            { id: 'ethics', name: '道法', icon: 'bi bi-book' },
+            { id: 'history', name: '历史', icon: 'bi bi-hourglass' }
+        ];
+
+        // 难度权重与颜色
+        const difficultySettings = {
+            'easy': { weight: 1, class: 'badge-easy', label: '简单' },
+            'medium': { weight: 1.5, class: 'badge-medium', label: '中等' },
+            'hard': { weight: 2, class: 'badge-hard', label: '难' }
+        };
+
+        // 图表颜色
+        const chartColors = [
+            '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6', 
+            '#1abc9c', '#d35400', '#34495e', '#16a085', '#c0392b'
+        ];
+
+        // 雪花元素数组
+        let snowflakeElements = [];
+        let snowflakeInterval;
+
+        // 开发者模式设置
+        let devSettings = {
+            customAverageBurden: null,
+            forceWhiteList: [],
+            forceBlackList: [],
+            importantSubjects: []
+        };
+
+        // 显示通知
+        function showNotification(message, duration = 2000) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                ${message}
+                <button class="notification-close"><i class="bi bi-x"></i></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            const closeBtn = notification.querySelector('.notification-close');
+            closeBtn.addEventListener('click', () => {
+                notification.style.animation = 'fadeOut 0.3s ease-in-out';
+                setTimeout(() => notification.remove(), 300);
+            });
+            
+            if (duration) {
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s ease-in-out';
+                    setTimeout(() => notification.remove(), 300);
+                }, duration);
+            }
+            
+            return notification;
+        }
+
+        // 显示Toast通知
+        function showToastNotification(message, icon = 'bi-info-circle', duration = 2000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `
+                <div>
+                    <i class="bi ${icon}"></i> ${message}
+                </div>
+                <i class="bi bi-toggle-off icon-status"></i>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // 2秒后改变图标状态
+            setTimeout(() => {
+                const iconStatus = toast.querySelector('.icon-status');
+                iconStatus.classList.remove('bi-toggle-off');
+                iconStatus.classList.add('bi-toggle-on', 'text-success');
+            }, 1000);
+            
+            if (duration) {
+                setTimeout(() => {
+                    toast.style.animation = 'fadeOut 0.3s ease-in-out';
+                    setTimeout(() => toast.remove(), 300);
+                }, duration);
+            }
+            
+            return toast;
+        }
+
+        // 创建雪花效果
+        function createSnowflakeEffect() {
+            // 清除现有雪花和定时器
+            snowflakeElements.forEach(snowflake => snowflake.remove());
+            snowflakeElements = [];
+            clearInterval(snowflakeInterval);
+            
+            // 雪花字符
+            const snowflakeChars = ['❄', '❅', '❆', '✻', '✼'];
+            
+            // 创建新的雪花效果
+            snowflakeInterval = setInterval(() => {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+                
+                // 随机位置
+                const left = Math.random() * window.innerWidth;
+                snowflake.style.left = `${left}px`;
+                snowflake.style.top = '-30px';
+                
+                // 随机大小
+                const size = 0.8 + Math.random() * 0.7;
+                snowflake.style.fontSize = `${size}rem`;
+                
+                // 随机动画持续时间
+                const duration = 8 + Math.random() * 12;
+                snowflake.style.animationDuration = `${duration}s`;
+                
+                document.body.appendChild(snowflake);
+                snowflakeElements.push(snowflake);
+                
+                // 动画结束后移除
+                setTimeout(() => {
+                    snowflake.remove();
+                    snowflakeElements = snowflakeElements.filter(s => s !== snowflake);
+                }, duration * 1000);
+            }, 300);
+        }
+
+        // 清除所有特效
+        function clearAllEffects() {
+            // 清除太阳效果
+            document.getElementById('sun-container').style.display = 'none';
+            
+            // 清除雪花效果
+            snowflakeElements.forEach(snowflake => snowflake.remove());
+            snowflakeElements = [];
+            clearInterval(snowflakeInterval);
+            
+            // 重置背景
+            document.body.className = 'default-theme';
+        }
+
+        // 初始化开发者模式弹窗
+        function initDevModal() {
+            const forceWhiteListContainer = document.getElementById('force-white-list');
+            const forceBlackListContainer = document.getElementById('force-black-list');
+            const importantSubjectsContainer = document.getElementById('important-subjects');
+            
+            // 清空现有内容
+            forceWhiteListContainer.innerHTML = '';
+            forceBlackListContainer.innerHTML = '';
+            importantSubjectsContainer.innerHTML = '';
+            
+            // 为每个科目创建复选框
+            subjects.forEach(subject => {
+                // 白名单复选框
+                const whiteCheckbox = document.createElement('div');
+                whiteCheckbox.className = 'dev-checkbox-item';
+                whiteCheckbox.innerHTML = `
+                    <input type="checkbox" id="force-white-${subject.id}" value="${subject.id}" ${devSettings.forceWhiteList.includes(subject.id) ? 'checked' : ''}>
+                    <label class="dev-checkbox-label" for="force-white-${subject.id}">${subject.name}</label>
+                `;
+                forceWhiteListContainer.appendChild(whiteCheckbox);
+                
+                // 黑名单复选框
+                const blackCheckbox = document.createElement('div');
+                blackCheckbox.className = 'dev-checkbox-item';
+                blackCheckbox.innerHTML = `
+                    <input type="checkbox" id="force-black-${subject.id}" value="${subject.id}" ${devSettings.forceBlackList.includes(subject.id) ? 'checked' : ''}>
+                    <label class="dev-checkbox-label" for="force-black-${subject.id}">${subject.name}</label>
+                `;
+                forceBlackListContainer.appendChild(blackCheckbox);
+                
+                // 重点科目复选框
+                const importantCheckbox = document.createElement('div');
+                importantCheckbox.className = 'dev-checkbox-item';
+                importantCheckbox.innerHTML = `
+                    <input type="checkbox" id="important-${subject.id}" value="${subject.id}" ${devSettings.importantSubjects.includes(subject.id) ? 'checked' : ''}>
+                    <label class="dev-checkbox-label" for="important-${subject.id}">${subject.name}</label>
+                `;
+                importantSubjectsContainer.appendChild(importantCheckbox);
+            });
+            
+            // 设置自定义平均负担值
+            document.getElementById('custom-average-burden').value = devSettings.customAverageBurden || '';
+        }
+
+        // 保存开发者设置
+        function saveDevSettings() {
+            // 获取自定义平均负担值
+            const customAverage = document.getElementById('custom-average-burden').value;
+            devSettings.customAverageBurden = customAverage ? parseFloat(customAverage) : null;
+            
+            // 获取强制白名单
+            devSettings.forceWhiteList = [];
+            document.querySelectorAll('#force-white-list input[type="checkbox"]:checked').forEach(checkbox => {
+                devSettings.forceWhiteList.push(checkbox.value);
+            });
+            
+            // 获取强制黑名单
+            devSettings.forceBlackList = [];
+            document.querySelectorAll('#force-black-list input[type="checkbox"]:checked').forEach(checkbox => {
+                devSettings.forceBlackList.push(checkbox.value);
+            });
+            
+            // 获取重点科目
+            devSettings.importantSubjects = [];
+            document.querySelectorAll('#important-subjects input[type="checkbox"]:checked').forEach(checkbox => {
+                devSettings.importantSubjects.push(checkbox.value);
+            });
+            
+            // 关闭弹窗
+            document.getElementById('dev-modal').style.display = 'none';
+            showToastNotification('开发者设置已保存', 'bi-check-circle', 2000);
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            const holidayType = document.getElementById('holiday-type');
+            const dateInput = document.getElementById('date-input');
+            const festivalInput = document.getElementById('festival-input');
+            const subjectsContainer = document.getElementById('subjects-container');
+            const generateReportBtn = document.getElementById('generate-report');
+            const reportSection = document.getElementById('report-section');
+            const backToTopBtn = document.getElementById('back-to-top');
+            const savePdfBtn = document.getElementById('save-pdf');
+            const saveImageBtn = document.getElementById('save-image');
+            const saveHtmlBtn = document.getElementById('save-html');
+            const listSection = document.getElementById('list-section');
+            const sunContainer = document.getElementById('sun-container');
+            const devModeBtn = document.getElementById('dev-mode-btn');
+            const devModal = document.getElementById('dev-modal');
+            const passwordModal = document.getElementById('password-modal');
+            const devModalSave = document.getElementById('dev-modal-save');
+            const devModalCancel = document.getElementById('dev-modal-cancel');
+            const passwordConfirm = document.getElementById('password-confirm');
+            const passwordCancel = document.getElementById('password-cancel');
+            const togglePasswordBtn = document.getElementById('toggle-password');
+            const passwordInput = document.getElementById('dev-password');
+
+            // 初始隐藏开发者相关元素
+            document.getElementById('password-modal').style.display = 'none';
+            document.getElementById('dev-modal').style.display = 'none';
+            document.getElementById('sun-container').style.display = 'none';
+
+            // 滚动时更新太阳位置
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.style.display = 'block';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+                
+                // 更新太阳位置
+                if (sunContainer && sunContainer.style.display !== 'none') {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    sunContainer.style.transform = `translateY(${scrollTop * 0.3}px)`;
+                }
+            });
+
+            // 密码显示/隐藏切换
+            togglePasswordBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                togglePasswordBtn.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
+            });
+
+            // 开发者模式按钮点击事件
+            devModeBtn.addEventListener('click', function() {
+                passwordModal.style.display = 'flex';
+                passwordInput.focus();
+            });
+
+            // 密码确认
+            passwordConfirm.addEventListener('click', function() {
+                const password = passwordInput.value;
+                if (password === 'xian0615') {
+                    passwordModal.style.display = 'none';
+                    passwordInput.value = ''; // 清空密码输入框
+                    passwordInput.setAttribute('type', 'password'); // 重置为密码类型
+                    togglePasswordBtn.innerHTML = '<i class="bi bi-eye"></i>'; // 重置图标
+                    initDevModal();
+                    devModal.style.display = 'flex';
+                } else {
+                    showToastNotification('密码错误', 'bi-exclamation-triangle', 2000);
+                }
+            });
+
+            // 密码取消
+            passwordCancel.addEventListener('click', function() {
+                passwordModal.style.display = 'none';
+                passwordInput.value = ''; // 清空密码输入框
+                passwordInput.setAttribute('type', 'password'); // 重置为密码类型
+                togglePasswordBtn.innerHTML = '<i class="bi bi-eye"></i>'; // 重置图标
+            });
+
+            // 开发者模式保存
+            devModalSave.addEventListener('click', saveDevSettings);
+
+            // 开发者模式取消
+            devModalCancel.addEventListener('click', function() {
+                devModal.style.display = 'none';
+            });
+
+            // 根据假期类型显示不同的输入框
+            holidayType.addEventListener('change', function() {
+                dateInput.style.display = 'none';
+                festivalInput.style.display = 'none';
+                
+                if (this.value === 'date') {
+                    dateInput.style.display = 'flex';
+                    clearAllEffects();
+                } else if (this.value === 'festival') {
+                    festivalInput.style.display = 'flex';
+                    
+                    // 节日模式
+                    showNotification('老六终端智能助手提醒您，检测到您假期类型选择节日，下面将要进行节日假期相关调整。', 2000);
+                    
+                    setTimeout(() => {
+                        const toast = showToastNotification('已开启节日模式', 'bi-balloon', 3000);
+                        
+                        setTimeout(() => {
+                            // 改变背景主题
+                            clearAllEffects();
+                            document.body.className = 'festival-theme';
+                            
+                            // 显示算法开启通知
+                            const algoToast = showToastNotification('已启用节日作业负担算法', 'bi-calculator', 3000);
+                            
+                            setTimeout(() => {
+                                // 显示白名单黑名单开启通知
+                                showToastNotification('白名单、黑名单已开启', 'bi-list-check', 3000);
+                            }, 1000);
+                        }, 1000);
+                    }, 2000);
+                } else if (this.value === 'summer') {
+                    // 暑假模式
+                    showNotification('老六终端智能助手提醒您，检测到您假期类型选择暑假，下面将要进行暑假相关调整。', 2000);
+                    
+                    setTimeout(() => {
+                        const toast = showToastNotification('已开启暑假模式', 'bi-sun', 3000);
+                        
+                        setTimeout(() => {
+                            // 改变背景主题
+                            clearAllEffects();
+                            document.body.className = 'summer-theme';
+                            sunContainer.style.display = 'block';
+                            
+                            // 显示算法开启通知
+                            const algoToast = showToastNotification('已启用暑假作业负担算法', 'bi-calculator', 3000);
+                            
+                            setTimeout(() => {
+                                // 显示白名单黑名单开启通知
+                                showToastNotification('白名单、黑名单已开启', 'bi-list-check', 3000);
+                            }, 1000);
+                        }, 1000);
+                    }, 2000);
+                } else if (this.value === 'winter') {
+                    // 寒假模式
+                    showNotification('老六终端智能助手提醒您，检测到您假期类型选择寒假，下面将要进行寒假相关调整。', 2000);
+                    
+                    setTimeout(() => {
+                        const toast = showToastNotification('已开启寒假模式', 'bi-snow', 3000);
+                        
+                        setTimeout(() => {
+                            // 改变背景主题
+                            clearAllEffects();
+                            document.body.className = 'winter-theme';
+                            createSnowflakeEffect();
+                            
+                            // 显示算法开启通知
+                            const algoToast = showToastNotification('已启用寒假作业负担算法', 'bi-calculator', 3000);
+                            
+                            setTimeout(() => {
+                                // 显示白名单黑名单开启通知
+                                showToastNotification('白名单、黑名单已开启', 'bi-list-check', 3000);
+                            }, 1000);
+                        }, 1000);
+                    }, 2000);
+                }
+            });
+
+            // 为每个科目创建输入区域
+            subjects.forEach(subject => {
+                const subjectCard = document.createElement('div');
+                subjectCard.className = 'subject-card';
+                subjectCard.innerHTML = `
+                    <h5><i class="${subject.icon} subject-icon"></i>${subject.name}</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="${subject.id}-workbook" class="form-label">练习册页数</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control workbook-pages" id="${subject.id}-workbook">
+                                    <select class="form-select difficulty-selector" id="${subject.id}-workbook-difficulty" style="max-width: 120px;">
+                                        <option value="easy">简单</option>
+                                        <option value="medium" selected>中等</option>
+                                        <option value="hard">难</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="${subject.id}-paper" class="form-label">试卷卷数</label>
+                                <div class="input-group">
+                                    <input type="number" min="0" class="form-control paper-count" id="${subject.id}-paper">
+                                    <select class="form-select difficulty-selector" id="${subject.id}-paper-difficulty" style="max-width: 120px;">
+                                        <option value="easy">简单</option>
+                                        <option value="medium" selected>中等</option>
+                                        <option value="hard">难</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="${subject.id}-other" class="form-label">其他作业</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control other-work" id="${subject.id}-other" placeholder="作业描述">
+                                    <select class="form-select difficulty-selector" id="${subject.id}-other-difficulty" style="max-width: 120px;">
+                                        <option value="easy">简单</option>
+                                        <option value="medium" selected>中等</option>
+                                        <option value="hard">难</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="${subject.id}-time" class="form-label">完成时间（小时）</label>
+                                <input type="number" min="0" step="0.1" class="form-control completion-time" id="${subject.id}-time">
+                            </div>
+                        </div>
+                    </div>
+                `;
+                subjectsContainer.appendChild(subjectCard);
+            });
+
+            // 生成报告
+            generateReportBtn.addEventListener('click', function() {
+                const holidayTypeValue = holidayType.value;
+                let holidayName = '';
+                
+                // 验证假期类型是否选择
+                if (!holidayTypeValue) {
+                    alert('请先选择假期类型！');
+                    return;
+                }
+                
+                // 获取假期信息
+                if (holidayTypeValue === 'date') {
+                    const startDate = document.getElementById('start-date').value;
+                    const endDate = document.getElementById('end-date').value;
+                    
+                    if (!startDate || !endDate) {
+                        alert('请填写完整的日期范围！');
+                        return;
+                    }
+                    
+                    holidayName = `${startDate} 至 ${endDate}`;
+                } else if (holidayTypeValue === 'festival') {
+                    holidayName = document.getElementById('festival-name').value;
+                    const festivalDays = document.getElementById('festival-days').value;
+                    
+                    if (!holidayName) {
+                        alert('请填写节日名称！');
+                        return;
+                    }
+                    
+                    if (!festivalDays) {
+                        alert('请填写节日假期天数！');
+                        return;
+                    }
+                    
+                    holidayName = `${holidayName} (${festivalDays}天)`;
+                } else if (holidayTypeValue === 'summer') {
+                    holidayName = '暑假';
+                } else if (holidayTypeValue === 'winter') {
+                    holidayName = '寒假';
+                }
+                
+                // 收集各科目数据
+                const subjectData = subjects.map(subject => {
+                    const workbookPages = parseInt(document.getElementById(`${subject.id}-workbook`).value) || 0;
+                    const workbookDifficulty = document.getElementById(`${subject.id}-workbook-difficulty`).value;
+                    const paperCount = parseInt(document.getElementById(`${subject.id}-paper`).value) || 0;
+                    const paperDifficulty = document.getElementById(`${subject.id}-paper-difficulty`).value;
+                    const otherWork = document.getElementById(`${subject.id}-other`).value;
+                    const otherDifficulty = document.getElementById(`${subject.id}-other-difficulty`).value;
+                    const completionTime = parseFloat(document.getElementById(`${subject.id}-time`).value) || 0;
+                    
+                    // 计算作业负担
+                    const workbookBurden = workbookPages * difficultySettings[workbookDifficulty].weight;
+                    const paperBurden = paperCount * 5 * difficultySettings[paperDifficulty].weight; // 假设每张试卷相当于5页练习册
+                    const otherBurden = otherWork ? 10 * difficultySettings[otherDifficulty].weight : 0; // 假设其他作业相当于10页练习册
+                    
+                    const totalBurden = workbookBurden + paperBurden + otherBurden;
+                    
+                    return {
+                        id: subject.id,
+                        name: subject.name,
+                        icon: subject.icon,
+                        workbookPages,
+                        workbookDifficulty,
+                        paperCount,
+                        paperDifficulty,
+                        otherWork,
+                        otherDifficulty,
+                        completionTime,
+                        totalBurden,
+                        hasWork: workbookPages > 0 || paperCount > 0 || otherWork || completionTime > 0
+                    };
+                }).filter(subject => subject.hasWork); // 只保留有作业的科目
+                
+                // 如果没有科目有作业
+                if (subjectData.length === 0) {
+                    alert('请至少填写一个科目的作业信息！');
+                    return;
+                }
+                
+                // 计算总负担
+                const totalBurden = subjectData.reduce((sum, subject) => sum + subject.totalBurden, 0);
+                
+                // 按负担排序
+                const sortedSubjects = [...subjectData].sort((a, b) => b.totalBurden - a.totalBurden);
+                
+                // 计算分界线（平均负担）
+                let averageBurden = subjectData.length > 0 ? 
+                    subjectData.reduce((sum, subject) => sum + subject.totalBurden, 0) / subjectData.length : 
+                    0;
+                
+                // 如果开发者设置了自定义平均负担值，则使用该值
+                if (devSettings.customAverageBurden !== null) {
+                    averageBurden = devSettings.customAverageBurden;
+                }
+                
+                // 生成白名单和黑名单
+                let whiteList = subjectData.filter(subject => subject.totalBurden > 0 && subject.totalBurden <= averageBurden);
+                let blackList = subjectData.filter(subject => subject.totalBurden > averageBurden);
+                
+                // 应用开发者强制设置的名单
+                if (devSettings.forceWhiteList.length > 0 || devSettings.forceBlackList.length > 0) {
+                    whiteList = subjectData.filter(subject => devSettings.forceWhiteList.includes(subject.id));
+                    blackList = subjectData.filter(subject => devSettings.forceBlackList.includes(subject.id));
+                }
+                
+                // 生成报告HTML
+                let reportHTML = `
+                    <div class="mb-4">
+                        <div class="alert alert-primary">
+                            <h4 class="alert-heading"><i class="bi bi-info-circle"></i> 作业概览</h4>
+                            <p>本次假期总作业负担值为: <strong>${totalBurden.toFixed(1)}</strong></p>
+                            <p>负担最重的科目是: <strong>${sortedSubjects[0].name}</strong> (${sortedSubjects[0].totalBurden.toFixed(1)})</p>
+                            <p>负担最轻的科目是: <strong>${sortedSubjects[sortedSubjects.length - 1].name}</strong> (${sortedSubjects[sortedSubjects.length - 1].totalBurden.toFixed(1)})</p>
+                            ${(holidayTypeValue === 'summer' || holidayTypeValue === 'winter' || holidayTypeValue === 'festival' || devSettings.customAverageBurden !== null) ? 
+                              `<p>平均负担值: <strong>${averageBurden.toFixed(1)}</strong> (分界线: 高于此值为负担过重)</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3"><i class="bi bi-bar-chart-line"></i> 作业负担分布</h4>
+                    <div class="chart-container">
+                        <canvas id="burden-distribution-chart"></canvas>
+                    </div>
+                    
+                    <h4 class="mt-5 mb-3"><i class="bi bi-list-ol"></i> 各科目作业详情</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>科目</th>
+                                    <th>练习册</th>
+                                    <th>试卷</th>
+                                    <th>其他作业</th>
+                                    <th>完成时间</th>
+                                    <th>负担值</th>
+                                    <th>占比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                subjectData.forEach(subject => {
+                    const burdenPercentage = totalBurden > 0 ? ((subject.totalBurden / totalBurden) * 100).toFixed(1) : 0;
+                    const progressWidth = totalBurden > 0 ? (subject.totalBurden / totalBurden * 100) : 0;
+                    
+                    // 判断是否在名单中
+                    const inWhiteList = whiteList.some(s => s.id === subject.id);
+                    const inBlackList = blackList.some(s => s.id === subject.id);
+                    const isImportant = devSettings.importantSubjects.includes(subject.id);
+                    
+                    reportHTML += `
+                        <tr>
+                            <td>
+                                ${inWhiteList || inBlackList ? `<span class="badge ${inWhiteList ? 'badge-success' : 'badge-danger'} me-1">${inWhiteList ? '白' : '黑'}</span>` : ''}
+                                <i class="${subject.icon}"></i> ${subject.name}
+                                ${isImportant ? '<span class="subject-important"><i class="bi bi-star-fill"></i></span>' : ''}
+                            </td>
+                            <td>
+                                ${subject.workbookPages > 0 ? subject.workbookPages + '页 <span class="badge ' + difficultySettings[subject.workbookDifficulty].class + ' badge-difficulty">' + difficultySettings[subject.workbookDifficulty].label + '</span>' : '-'}
+                            </td>
+                            <td>
+                                ${subject.paperCount > 0 ? subject.paperCount + '卷 <span class="badge ' + difficultySettings[subject.paperDifficulty].class + ' badge-difficulty">' + difficultySettings[subject.paperDifficulty].label + '</span>' : '-'}
+                            </td>
+                            <td>
+                                ${subject.otherWork ? subject.otherWork + ' <span class="badge ' + difficultySettings[subject.otherDifficulty].class + ' badge-difficulty">' + difficultySettings[subject.otherDifficulty].label + '</span>' : '-'}
+                            </td>
+                            <td>${subject.completionTime}小时</td>
+                            <td>${subject.totalBurden.toFixed(1)}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress progress-thin flex-grow-1 me-2">
+                                        <div class="progress-bar" role="progressbar" style="width: ${progressWidth}%" aria-valuenow="${progressWidth}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <span>${burdenPercentage}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                reportHTML += `</tbody></table></div>`;
+                
+                // 添加负担排行图表
+                reportHTML += `
+                    <h4 class="mt-5 mb-3"><i class="bi bi-trophy"></i> 作业负担排行</h4>
+                    <div class="chart-container">
+                        <canvas id="ranking-chart"></canvas>
+                    </div>
+                `;
+                
+                // 更新报告内容
+                document.getElementById('report-content').innerHTML = reportHTML;
+                document.getElementById('report-holiday-info').textContent = `假期: ${holidayName}`;
+                
+                // 设置报告日期
+                const today = new Date();
+                document.getElementById('report-date').textContent = `生成日期: ${today.toLocaleDateString('zh-CN')} ${today.toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'})}`;
+                
+                // 显示白名单和黑名单（如果是寒暑假或节日模式或有自定义设置）
+                if (holidayTypeValue === 'summer' || holidayTypeValue === 'winter' || holidayTypeValue === 'festival' || devSettings.customAverageBurden !== null || devSettings.forceWhiteList.length > 0 || devSettings.forceBlackList.length > 0) {
+                    listSection.style.display = 'block';
+                    
+                    // 清空现有列表
+                    document.getElementById('white-list-items').innerHTML = '';
+                    document.getElementById('black-list-items').innerHTML = '';
+                    
+                    // 填充白名单
+                    whiteList.forEach(subject => {
+                        const item = document.createElement('div');
+                        item.className = 'list-item';
+                        item.innerHTML = `
+                            <i class="${subject.icon} me-2"></i> ${subject.name} (${subject.totalBurden.toFixed(1)})
+                            ${devSettings.importantSubjects.includes(subject.id) ? '<span class="subject-important ms-2"><i class="bi bi-star-fill"></i></span>' : ''}
+                        `;
+                        document.getElementById('white-list-items').appendChild(item);
+                    });
+                    
+                    // 填充黑名单
+                    blackList.forEach(subject => {
+                        const item = document.createElement('div');
+                        item.className = 'list-item';
+                        item.innerHTML = `
+                            <i class="${subject.icon} me-2"></i> ${subject.name} (${subject.totalBurden.toFixed(1)})
+                            ${devSettings.importantSubjects.includes(subject.id) ? '<span class="subject-important ms-2"><i class="bi bi-star-fill"></i></span>' : ''}
+                        `;
+                        document.getElementById('black-list-items').appendChild(item);
+                    });
+                } else {
+                    listSection.style.display = 'none';
+                }
+                
+                // 显示报告
+                reportSection.style.display = 'block';
+                
+                // 滚动到报告位置
+                reportSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // 显示返回顶部按钮
+                backToTopBtn.style.display = 'block';
+                
+                // 绘制图表
+                drawCharts(subjectData, sortedSubjects, totalBurden);
+            });
+
+            // 绘制图表
+            function drawCharts(subjectData, sortedSubjects, totalBurden) {
+                // 负担分布饼图
+                const ctx1 = document.getElementById('burden-distribution-chart').getContext('2d');
+                new Chart(ctx1, {
+                    type: 'doughnut',
+                    data: {
+                        labels: subjectData.map(s => s.name),
+                        datasets: [{
+                            data: subjectData.map(s => s.totalBurden),
+                            backgroundColor: chartColors,
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.raw;
+                                        const percentage = totalBurden > 0 ? (value / totalBurden * 100).toFixed(1) : 0;
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                // 负担排行条形图
+                const ctx2 = document.getElementById('ranking-chart').getContext('2d');
+                new Chart(ctx2, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedSubjects.map(s => s.name),
+                        datasets: [{
+                            label: '作业负担值',
+                            data: sortedSubjects.map(s => s.totalBurden),
+                            backgroundColor: sortedSubjects.map((_, i) => chartColors[i % chartColors.length]),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '负担值'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: '科目'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterLabel: function(context) {
+                                        const subject = subjectData.find(s => s.name === context.label);
+                                        return [
+                                            `练习册: ${subject.workbookPages}页 (${difficultySettings[subject.workbookDifficulty].label})`,
+                                            `试卷: ${subject.paperCount}卷 (${difficultySettings[subject.paperDifficulty].label})`,
+                                            `其他: ${subject.otherWork || '无'} (${difficultySettings[subject.otherDifficulty].label})`,
+                                            `完成时间: ${subject.completionTime}小时`
+                                        ];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 返回顶部按钮
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 保存为PDF
+            savePdfBtn.addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const reportElement = document.getElementById('report');
+                const filename = `老六假期作业负担报告_${new Date().toISOString().slice(0, 10)}.pdf`;
+                
+                html2canvas(reportElement, {
+                    scale: 2,
+                    logging: true,
+                    useCORS: true
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const pageHeight = 295;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+                    
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                    
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    
+                    pdf.save(filename);
+                });
+            });
+
+            // 保存为图片
+            saveImageBtn.addEventListener('click', function() {
+                const reportElement = document.getElementById('report');
+                const filename = `老六假期作业负担报告_${new Date().toISOString().slice(0, 10)}.png`;
+                
+                html2canvas(reportElement, {
+                    scale: 2,
+                    logging: true,
+                    useCORS: true
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = filename;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            });
+
+            // 保存为HTML
+            saveHtmlBtn.addEventListener('click', function() {
+                const reportElement = document.getElementById('report');
+                const htmlContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>老六假期作业负担报告</title>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+                        <style>
+                            body { padding: 20px; font-family: 'Microsoft YaHei', sans-serif; }
+                            .report-card { max-width: 1000px; margin: 0 auto; }
+                        </style>
+                    </head>
+                    <body>
+                        ${reportElement.outerHTML}
+                    </body>
+                    </html>
+                `;
+                
+                const filename = `老六假期作业负担报告_${new Date().toISOString().slice(0, 10)}.html`;
+                const blob = new Blob([htmlContent], { type: 'text/html' });
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            });
+        });
+    </script>
+</body>
+</html>

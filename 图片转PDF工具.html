@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老六工具 - 图片转PDF/Word</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #0a192f;
+            color: #e6f1ff;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(100, 217, 254, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(231, 72, 234, 0.1) 0%, transparent 50%);
+        }
+        h1 {
+            text-align: center;
+            color: #64d9fe;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(100, 217, 254, 0.3);
+            font-weight: 600;
+        }
+        .upload-area {
+            border: 2px dashed #64d9fe;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: rgba(10, 25, 47, 0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .upload-area:hover {
+            border-color: #e748ea;
+            background-color: rgba(16, 36, 66, 0.7);
+        }
+        .upload-area.drag-over {
+            border-color: #e748ea;
+            background-color: rgba(16, 36, 66, 0.9);
+            box-shadow: 0 0 20px rgba(231, 72, 234, 0.3);
+        }
+        .upload-icon {
+            font-size: 48px;
+            color: #64d9fe;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(100, 217, 254, 0.3);
+        }
+        .preview-container {
+            margin-top: 20px;
+            display: none;
+            background-color: rgba(10, 25, 47, 0.7);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .a4-preview {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .preview-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #64d9fe 0%, #e748ea 100%);
+            background-size: 200% 200%;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            background-position: 100% 100%;
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        #convertBtn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background-size: 200% 200%;
+        }
+        #convertBtn:hover {
+            background-position: 100% 100%;
+        }
+        #exportPdf {
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            background-size: 200% 200%;
+        }
+        #exportPdf:hover {
+            background-position: 100% 100%;
+        }
+        #exportWord {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 200% 200%;
+        }
+        #exportWord:hover {
+            background-position: 100% 100%;
+        }
+        #folderUploadBtn {
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            background-size: 200% 200%;
+        }
+        #folderUploadBtn:hover {
+            background-position: 100% 100%;
+        }
+        .file-input {
+            display: none;
+        }
+        .instructions {
+            background-color: rgba(16, 36, 66, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #64d9fe;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .image-list {
+            margin-top: 20px;
+            border: 1px solid #1e2a4a;
+            border-radius: 8px;
+            background-color: rgba(16, 36, 66, 0.7);
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .image-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #1e2a4a;
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .image-item:last-child {
+            border-bottom: none;
+        }
+        .image-item:hover {
+            background-color: rgba(100, 217, 254, 0.1);
+            transform: translateX(5px);
+        }
+        .image-thumbnail {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 15px;
+            border-radius: 4px;
+            border: 1px solid #64d9fe;
+        }
+        .image-name {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #e6f1ff;
+        }
+        .delete-btn {
+            color: #ff758c;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 5px;
+            transition: all 0.2s;
+        }
+        .delete-btn:hover {
+            color: #ff4757;
+            transform: scale(1.2);
+        }
+        .upload-options {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .watermark-container {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(16, 36, 66, 0.7);
+            border-radius: 8px;
+            color: rgba(230, 241, 255, 0.7);
+            font-size: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .tech-circle {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 217, 254, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .tech-circle:nth-child(1) {
+            top: -150px;
+            left: -150px;
+        }
+        .tech-circle:nth-child(2) {
+            bottom: -150px;
+            right: -150px;
+            background: radial-gradient(circle, rgba(231, 72, 234, 0.1) 0%, transparent 70%);
+        }
+    </style>
+</head>
+<body>
+    <div class="tech-circle"></div>
+    <div class="tech-circle"></div>
+    
+    <h1>老六工具 - 图片转PDF/Word</h1>
+    
+    <div class="instructions">
+        <p>使用方法：</p>
+        <ol>
+            <li>点击上传按钮选择图片或文件夹，或直接将图片拖拽到上传区域</li>
+            <li>在图片列表中可调整顺序或删除图片</li>
+            <li>点击"转换"按钮预览效果</li>
+            <li>选择导出为PDF或Word</li>
+        </ol>
+    </div>
+    
+    <div id="uploadArea" class="upload-area">
+        <div class="upload-icon">📁</div>
+        <p>点击上传图片，或直接将图片拖拽到此处</p>
+        <p>支持JPG、PNG等常见图片格式</p>
+        <div class="upload-options">
+            <button id="fileUploadBtn">选择文件上传</button>
+            <button id="folderUploadBtn">选择文件夹上传</button>
+        </div>
+        <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+        <input type="file" id="folderInput" class="file-input" accept="image/*" multiple webkitdirectory directory>
+    </div>
+    
+    <div id="imageListContainer" class="image-list" style="display: none;">
+        <h3>已上传图片 (拖拽可排序)</h3>
+        <div id="imageList"></div>
+    </div>
+    
+    <button id="convertBtn" disabled>转换</button>
+    
+    <div class="preview-container" id="previewContainer">
+        <div class="preview-header">
+            <h2>预览效果 (A4尺寸)</h2>
+        </div>
+        <div class="a4-preview" id="a4Preview">
+            <!-- 图片将在这里显示 -->
+        </div>
+        <div class="action-buttons">
+            <button id="exportPdf" disabled>导出为PDF</button>
+            <button id="exportWord" disabled>导出为Word</button>
+        </div>
+    </div>
+
+    <div class="watermark-container">
+        老六系列产品 | 版本号 2.5.6 | 版权信息归星皓版权所有
+    </div>
+
+    <script>
+        // 全局变量
+        let uploadedImages = [];
+        const { jsPDF } = window.jspdf;
+        
+        // 获取DOM元素
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const folderInput = document.getElementById('folderInput');
+        const fileUploadBtn = document.getElementById('fileUploadBtn');
+        const folderUploadBtn = document.getElementById('folderUploadBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const previewContainer = document.getElementById('previewContainer');
+        const a4Preview = document.getElementById('a4Preview');
+        const exportPdfBtn = document.getElementById('exportPdf');
+        const exportWordBtn = document.getElementById('exportWord');
+        const imageListContainer = document.getElementById('imageListContainer');
+        const imageList = document.getElementById('imageList');
+        
+        // 初始化排序功能
+        const sortable = new Sortable(imageList, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            onEnd: function() {
+                updateImageOrder();
+            }
+        });
+        
+        // 更新图片顺序
+        function updateImageOrder() {
+            const items = imageList.children;
+            const newOrder = [];
+            for (let i = 0; i < items.length; i++) {
+                const index = parseInt(items[i].getAttribute('data-index'));
+                newOrder.push(uploadedImages[index]);
+            }
+            uploadedImages = newOrder;
+            
+            // 更新所有项目的data-index属性
+            for (let i = 0; i < items.length; i++) {
+                items[i].setAttribute('data-index', i);
+            }
+        }
+        
+        // 文件上传按钮点击事件
+        fileUploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // 文件夹上传按钮点击事件
+        folderUploadBtn.addEventListener('click', () => {
+            folderInput.click();
+        });
+        
+        // 文件选择事件
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+            e.target.value = ''; // 清除选择，以便重复选择相同文件
+        });
+        
+        // 文件夹选择事件
+        folderInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+            e.target.value = ''; // 清除选择，以便重复选择相同文件夹
+        });
+        
+        // 拖拽事件
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        // 处理上传的文件
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            
+            // 如果是第一次上传，清空原有内容
+            if (uploadedImages.length === 0) {
+                a4Preview.innerHTML = '';
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.match('image.*')) continue;
+                
+                const reader = new FileReader();
+                reader.onload = (function(file) {
+                    return function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.display = 'none';
+                        document.body.appendChild(img);
+                        
+                        const imageData = {
+                            file: file,
+                            dataUrl: e.target.result,
+                            element: img
+                        };
+                        
+                        uploadedImages.push(imageData);
+                        updateImageList();
+                        
+                        if (uploadedImages.length > 0) {
+                            convertBtn.disabled = false;
+                            imageListContainer.style.display = 'block';
+                        }
+                    };
+                })(file);
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        // 更新图片列表
+        function updateImageList() {
+            imageList.innerHTML = '';
+            
+            uploadedImages.forEach((imgData, index) => {
+                const item = document.createElement('div');
+                item.className = 'image-item';
+                item.setAttribute('data-index', index);
+                
+                const thumbnail = document.createElement('img');
+                thumbnail.className = 'image-thumbnail';
+                thumbnail.src = imgData.dataUrl;
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'image-name';
+                nameSpan.textContent = imgData.file.name;
+                
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '&times;';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeImage(index);
+                });
+                
+                item.appendChild(thumbnail);
+                item.appendChild(nameSpan);
+                item.appendChild(deleteBtn);
+                
+                imageList.appendChild(item);
+            });
+        }
+        
+        // 删除图片
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            updateImageList();
+            
+            if (uploadedImages.length === 0) {
+                convertBtn.disabled = true;
+                imageListContainer.style.display = 'none';
+                previewContainer.style.display = 'none';
+                exportPdfBtn.disabled = true;
+                exportWordBtn.disabled = true;
+            }
+        }
+        
+        // 转换按钮点击事件
+        convertBtn.addEventListener('click', () => {
+            if (uploadedImages.length === 0) return;
+            
+            a4Preview.innerHTML = '';
+            
+            // 只显示第一张图片用于预览
+            const imgData = uploadedImages[0];
+            const imgContainer = document.createElement('div');
+            imgContainer.style.width = '210mm';
+            imgContainer.style.height = '297mm';
+            imgContainer.style.position = 'relative';
+            imgContainer.style.overflow = 'hidden';
+            
+            const img = document.createElement('img');
+            img.src = imgData.dataUrl;
+            img.style.position = 'absolute';
+            img.style.top = '0';
+            img.style.left = '0';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'contain';
+            
+            imgContainer.appendChild(img);
+            a4Preview.appendChild(imgContainer);
+            
+            previewContainer.style.display = 'block';
+            exportPdfBtn.disabled = false;
+            exportWordBtn.disabled = false;
+            
+            // 滚动到预览区域
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // 导出为PDF
+        exportPdfBtn.addEventListener('click', async () => {
+            if (uploadedImages.length === 0) return;
+            
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm'
+            });
+            
+            // 按照用户排序后的顺序导出
+            for (let i = 0; i < uploadedImages.length; i++) {
+                if (i > 0) {
+                    pdf.addPage();
+                }
+                
+                const imgData = uploadedImages[i];
+                const img = new Image();
+                img.src = imgData.dataUrl;
+                
+                await new Promise((resolve) => {
+                    img.onload = () => {
+                        // 计算图片在A4纸上的尺寸和位置
+                        const a4Width = 210; // A4宽度(mm)
+                        const a4Height = 297; // A4高度(mm)
+                        
+                        let imgWidth = img.width;
+                        let imgHeight = img.height;
+                        
+                        // 计算缩放比例
+                        const widthRatio = a4Width / imgWidth;
+                        const heightRatio = a4Height / imgHeight;
+                        const scale = Math.min(widthRatio, heightRatio);
+                        
+                        // 计算居中位置
+                        const scaledWidth = imgWidth * scale;
+                        const scaledHeight = imgHeight * scale;
+                        const x = (a4Width - scaledWidth) / 2;
+                        const y = (a4Height - scaledHeight) / 2;
+                        
+                        // 添加图片到PDF
+                        pdf.addImage(imgData.dataUrl, 'JPEG', x, y, scaledWidth, scaledHeight);
+                        
+                        resolve();
+                    };
+                });
+            }
+            
+            pdf.save('老六工具-图片转PDF.pdf');
+        });
+        
+        // 导出为Word
+        exportWordBtn.addEventListener('click', async () => {
+            if (uploadedImages.length === 0) return;
+            
+            const { Document, Packer, Paragraph, ImageRun } = docx;
+            
+            const doc = new Document({
+                sections: []
+            });
+            
+            // 按照用户排序后的顺序导出
+            for (let i = 0; i < uploadedImages.length; i++) {
+                const imgData = uploadedImages[i];
+                
+                // 创建新段落并添加图片
+                const image = new ImageRun({
+                    data: imgData.dataUrl.split(',')[1],
+                    transformation: {
+                        width: 595,  // A4宽度(pts)
+                        height: 842,  // A4高度(pts)
+                    }
+                });
+                
+                const paragraph = new Paragraph({
+                    children: [image],
+                    alignment: docx.AlignmentType.CENTER
+                });
+                
+                // 添加新节(每张图片一页)
+                doc.addSection({
+                    children: [paragraph],
+                    properties: {
+                        page: {
+                            size: {
+                                width: 595,  // A4宽度(pts)
+                                height: 842  // A4高度(pts)
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // 生成Word文档并下载
+            const packer = new Packer();
+            const mimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            const docBlob = await packer.toBlob(doc);
+            saveAs(docBlob, "老六工具-图片转Word.docx");
+        });
+    </script>
+</body>
+</html>

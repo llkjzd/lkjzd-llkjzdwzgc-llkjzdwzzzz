@@ -1,0 +1,2400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老六科技工具</title>
+    <style>
+        :root {
+            --primary-color: #00f2fe;
+            --secondary-color: #4facfe;
+            --dark-color: #0f172a;
+            --light-color: #e2e8f0;
+            --accent-color: #4fd1c5;
+            --danger-color: #f87171;
+            --success-color: #34d399;
+            --warning-color: #fbbf24;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SimSun', '宋体', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 242, 254, 0.08) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(79, 172, 254, 0.08) 0%, transparent 30%),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 1));
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 新增水印样式 */
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: var(--primary-color);
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: right;
+            opacity: 0.7;
+            z-index: 9999;
+            pointer-events: none;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            color: var(--accent-color);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(79, 209, 197, 0.3);
+        }
+        
+        .glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: -1;
+            opacity: 0.15;
+        }
+        
+        .glow-1 {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--primary-color), transparent 70%);
+            top: -50px;
+            left: 10%;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .glow-2 {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent-color), transparent 70%);
+            bottom: -100px;
+            right: 5%;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+        
+        .glow-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--secondary-color), transparent 70%);
+            top: 50%;
+            left: 5%;
+            animation: float 7s ease-in-out infinite 2s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+        
+        .cyber-border {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+        }
+        
+        .cyber-border::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            animation: borderGlow 3s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        .section {
+            background-color: rgba(15, 23, 42, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.03) 0%, rgba(79, 209, 197, 0.03) 100%);
+            pointer-events: none;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
+        }
+        
+        h2 i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .button {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: var(--light-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        
+        .button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1) 0%, rgba(79, 209, 197, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+        
+        .button:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 242, 254, 0.25);
+            border-color: var(--primary-color);
+        }
+        
+        .button:hover::before {
+            opacity: 1;
+        }
+        
+        .button::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                transparent 0%,
+                transparent 45%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 55%,
+                transparent 100%
+            );
+            transform: rotate(30deg);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+        
+        .button:hover::after {
+            animation: shine 1.5s ease;
+        }
+        
+        @keyframes shine {
+            0% { left: -50%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { left: 150%; opacity: 0; }
+        }
+        
+        .button i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .button h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .button p {
+            font-size: 0.95rem;
+            color: rgba(226, 232, 240, 0.8);
+            line-height: 1.5;
+        }
+        
+        .ai-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .ai-button {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--light-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.1) 0%, rgba(79, 209, 197, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .ai-button:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 242, 254, 0.2);
+        }
+        
+        .ai-button:hover::before {
+            opacity: 1;
+        }
+        
+        .ai-button img {
+            width: 36px;
+            height: 36px;
+            margin-right: 12px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+        
+        .ai-button span {
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+        
+        /* 工具区域样式 */
+        .tool-container {
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            display: none;
+        }
+        
+        .tool-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .tool-header h3 {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+        }
+        
+        .close-tool {
+            background: rgba(226, 232, 240, 0.1);
+            border: none;
+            color: var(--light-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close-tool:hover {
+            background: rgba(226, 232, 240, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        /* 计算器样式 */
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            max-width: 320px;
+            margin: 0 auto;
+        }
+        
+        .calculator-display {
+            grid-column: span 4;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: right;
+            font-size: 1.8rem;
+            height: 80px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .calculator-display span {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+        }
+        
+        .calc-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--light-color);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .calc-btn:hover {
+            background: rgba(0, 242, 254, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .calc-btn.operator {
+            background: rgba(79, 209, 197, 0.2);
+            color: var(--accent-color);
+        }
+        
+        .calc-btn.equals {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+        
+        .calc-btn.clear {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--danger-color);
+        }
+        
+        /* 表格生成器样式 */
+        .table-generator {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .table-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .table-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .table-control label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .table-control input, .table-control select {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .table-control input:focus, .table-control select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 242, 254, 0.2);
+        }
+        
+        .table-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .table-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: var(--dark-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .table-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .table-btn.secondary {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: var(--light-color);
+        }
+        
+        .table-btn.secondary:hover {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--primary-color);
+        }
+        
+        .table-preview {
+            overflow-x: auto;
+            margin-top: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            background: rgba(30, 41, 59, 0.5);
+        }
+        
+        .table-preview table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table-preview th, .table-preview td {
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .table-preview th {
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--accent-color);
+        }
+        
+        .table-preview tr:nth-child(even) {
+            background: rgba(0, 242, 254, 0.05);
+        }
+        
+        .table-preview td input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: var(--light-color);
+            padding: 5px;
+        }
+        
+        .table-preview td input:focus {
+            outline: none;
+            background: rgba(0, 242, 254, 0.1);
+        }
+        
+        /* 老六书生成器样式 */
+        .document-generator {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .document-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .document-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .document-control label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .document-control input, 
+        .document-control select, 
+        .document-control textarea {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .document-control textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .document-preview-container {
+            margin-top: 20px;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.5);
+        }
+        
+        .document-preview {
+            background: white;
+            color: black;
+            padding: 30px;
+            min-height: 500px;
+            font-family: 'SimSun', '宋体';
+            position: relative;
+        }
+        
+        .document-preview .red-header {
+            color: red;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border-bottom: 2px solid red;
+            padding-bottom: 10px;
+        }
+        
+        .document-preview .title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .document-preview .content {
+            font-size: 16px;
+            line-height: 1.8;
+            text-indent: 2em;
+            margin-bottom: 20px;
+        }
+        
+        .document-preview .conclusion {
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .document-preview .slogan {
+            text-align: center;
+            font-style: italic;
+            margin: 20px 0;
+        }
+        
+        .document-preview .footer {
+            text-align: right;
+            margin-top: 100px;
+            position: relative;
+        }
+        
+        .document-preview .stamp-container {
+            position: absolute;
+            right: 0;
+            bottom: -20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .document-preview .stamp {
+            opacity: 0.8;
+            max-width: 150px;
+            max-height: 150px;
+            margin-top: -30px;
+        }
+        
+        .document-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* 颜色选择器样式 */
+        .color-picker-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .color-preview {
+            width: 100%;
+            height: 100px;
+            border-radius: 10px;
+            margin: 0 auto;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            transition: background-color 0.3s ease;
+        }
+        
+        .color-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .color-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .color-control label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .color-control input {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .color-code {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-code input {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .color-code button {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: var(--dark-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .color-code button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        /* 二维码生成器样式 */
+        .qr-generator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .qr-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .qr-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .qr-control label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .qr-control input, .qr-control select {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .qr-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        #qr-code {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+        
+        .qr-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 单位转换器样式 */
+        .unit-converter-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .unit-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .unit-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .unit-control label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .unit-control select, .unit-control input {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .unit-result {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        /* 密码生成器样式 */
+        .password-generator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .password-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .password-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .password-control label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .password-control input, .password-control select {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--light-color);
+        }
+        
+        .password-result {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .password-result input {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            color: var(--light-color);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .password-result button {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: var(--dark-color);
+            border: none;
+            padding: 0 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .password-result button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.3);
+        }
+        
+        .password-strength {
+            margin-top: 10px;
+            height: 5px;
+            border-radius: 5px;
+            background: var(--danger-color);
+            transition: all 0.3s ease;
+        }
+        
+        /* 文本工具样式 */
+        .text-tools-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .text-area-container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .text-area-container {
+                flex-direction: column;
+            }
+        }
+        
+        .text-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .text-area label {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+        
+        .text-area textarea {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            color: var(--light-color);
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .text-tools-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .text-tool-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            color: var(--light-color);
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .text-tool-btn:hover {
+            background: rgba(0, 242, 254, 0.2);
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+        
+        .text-tool-btn.primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: var(--dark-color);
+            font-weight: bold;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .calculator {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .ai-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calculator {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .calc-btn {
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            .table-buttons, .document-buttons, .qr-buttons {
+                flex-direction: column;
+            }
+            
+            /* 移动端水印调整 */
+            .watermark {
+                font-size: 10px;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+        
+        /* 通知样式 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid var(--success-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification i {
+            font-size: 1.5rem;
+        }
+        
+        .notification.success {
+            border-color: var(--success-color);
+        }
+        
+        .notification.success i {
+            color: var(--success-color);
+        }
+        
+        .notification.error {
+            border-color: var(--danger-color);
+        }
+        
+        .notification.error i {
+            color: var(--danger-color);
+        }
+        
+        .notification.warning {
+            border-color: var(--warning-color);
+        }
+        
+        .notification.warning i {
+            color: var(--warning-color);
+        }
+        
+        .notification p {
+            font-size: 0.9rem;
+            margin: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- 新增水印 -->
+    <div class="watermark">
+        老六系列产品<br>
+        版本号：21.3.8<br>
+        © 归星皓版权所有
+    </div>
+    
+    <div class="container">
+        <header>
+            <div class="glow glow-1"></div>
+            <div class="glow glow-2"></div>
+            <div class="glow glow-3"></div>
+            <h1>老六科技工具</h1>
+            <p class="subtitle">老六工具 · 效率提升 · 智能创新</p>
+        </header>
+        
+        <div class="section cyber-border">
+            <h2><i class="fas fa-folder-open"></i>快速打开文件</h2>
+            <div class="button-grid">
+                <div class="button" onclick="window.open('老六网站.html')">
+                    <i class="fas fa-globe"></i>
+                    <h3>老六网站</h3>
+                    <p>快速访问老六网站</p>
+                </div>
+                
+                <div class="button" onclick="window.open('老六假期作业负担统计系统.html')">
+                    <i class="fas fa-book"></i>
+                    <h3>作业负担统计系统</h3>
+                    <p>统计和分析假期作业负担</p>
+                </div>
+                
+                <div class="button" onclick="window.open('作业负担智能分析智能保存系统.html')">
+                    <i class="fas fa-brain"></i>
+                    <h3>作业智能分析系统</h3>
+                    <p>智能分析与保存作业数据</p>
+                </div>
+                
+                <div class="button" onclick="window.open('遥遥领先.mp3')">
+                    <i class="fas fa-music"></i>
+                    <h3>遥遥领先</h3>
+                    <p>播放激励音频</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section cyber-border">
+            <h2><i class="fas fa-tools"></i>科技工具集</h2>
+            <div class="button-grid">
+                <div class="button" onclick="openTool('calculator')">
+                    <i class="fas fa-calculator"></i>
+                    <h3>科学计算器</h3>
+                    <p>支持键盘输入的科学计算器</p>
+                </div>
+                
+                <div class="button" onclick="openTool('table-generator')">
+                    <i class="fas fa-table"></i>
+                    <h3>表格生成器</h3>
+                    <p>创建、编辑和下载表格</p>
+                </div>
+                
+                <div class="button" onclick="openTool('document-generator')">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>老六书生成器</h3>
+                    <p>生成认定书、通知、告知书</p>
+                </div>
+                
+                <div class="button" onclick="openTool('color-picker')">
+                    <i class="fas fa-palette"></i>
+                    <h3>颜色选择器</h3>
+                    <p>RGB/HEX颜色选择工具</p>
+                </div>
+                
+                <div class="button" onclick="openTool('qr-generator')">
+                    <i class="fas fa-qrcode"></i>
+                    <h3>二维码生成器</h3>
+                    <p>生成自定义二维码</p>
+                </div>
+                
+                <div class="button" onclick="openTool('unit-converter')">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h3>单位转换器</h3>
+                    <p>多种单位之间的转换</p>
+                </div>
+                
+                <div class="button" onclick="openTool('password-generator')">
+                    <i class="fas fa-key"></i>
+                    <h3>密码生成器</h3>
+                    <p>生成高强度随机密码</p>
+                </div>
+                
+                <div class="button" onclick="openTool('text-tools')">
+                    <i class="fas fa-font"></i>
+                    <h3>文本工具</h3>
+                    <p>各种文本处理工具</p>
+                </div>
+            </div>
+            
+            <!-- 计算器工具 -->
+            <div id="calculator" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-calculator"></i> 科学计算器</h3>
+                    <button class="close-tool" onclick="closeTool('calculator')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="calculator">
+                    <div class="calculator-display"><span id="calc-display">0</span></div>
+                    <button class="calc-btn clear" onclick="clearCalculator()">C</button>
+                    <button class="calc-btn" onclick="appendToDisplay('(')">(</button>
+                    <button class="calc-btn" onclick="appendToDisplay(')')">)</button>
+                    <button class="calc-btn operator" onclick="setOperation('/')">/</button>
+                    <button class="calc-btn" onclick="appendToDisplay('7')">7</button>
+                    <button class="calc-btn" onclick="appendToDisplay('8')">8</button>
+                    <button class="calc-btn" onclick="appendToDisplay('9')">9</button>
+                    <button class="calc-btn operator" onclick="setOperation('*')">×</button>
+                    <button class="calc-btn" onclick="appendToDisplay('4')">4</button>
+                    <button class="calc-btn" onclick="appendToDisplay('5')">5</button>
+                    <button class="calc-btn" onclick="appendToDisplay('6')">6</button>
+                    <button class="calc-btn operator" onclick="setOperation('-')">-</button>
+                    <button class="calc-btn" onclick="appendToDisplay('1')">1</button>
+                    <button class="calc-btn" onclick="appendToDisplay('2')">2</button>
+                    <button class="calc-btn" onclick="appendToDisplay('3')">3</button>
+                    <button class="calc-btn operator" onclick="setOperation('+')">+</button>
+                    <button class="calc-btn" onclick="appendToDisplay('0')">0</button>
+                    <button class="calc-btn" onclick="appendToDisplay('.')">.</button>
+                    <button class="calc-btn" onclick="backspace()">⌫</button>
+                    <button class="calc-btn equals" onclick="calculate()">=</button>
+                </div>
+            </div>
+            
+            <!-- 表格生成器工具 -->
+            <div id="table-generator" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-table"></i> 表格生成器</h3>
+                    <button class="close-tool" onclick="closeTool('table-generator')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="table-generator">
+                    <div class="table-controls">
+                        <div class="table-control">
+                            <label for="rows">行数</label>
+                            <input type="number" id="rows" min="1" max="20" value="5">
+                        </div>
+                        <div class="table-control">
+                            <label for="cols">列数</label>
+                            <input type="number" id="cols" min="1" max="10" value="3">
+                        </div>
+                        <div class="table-control">
+                            <label for="table-style">表格样式</label>
+                            <select id="table-style">
+                                <option value="basic">基础样式</option>
+                                <option value="striped">条纹样式</option>
+                                <option value="dark">深色样式</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-buttons">
+                        <button class="table-btn" onclick="generateTable()">生成表格</button>
+                        <button class="table-btn secondary" onclick="editTable()" id="edit-btn" disabled>编辑表格</button>
+                        <button class="table-btn secondary" onclick="downloadTable()" id="download-btn" disabled>下载表格</button>
+                    </div>
+                    <div class="table-preview" id="table-preview"></div>
+                </div>
+            </div>
+            
+            <!-- 老六书生成器工具 -->
+            <div id="document-generator" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-file-alt"></i> 老六书生成器</h3>
+                    <button class="close-tool" onclick="closeTool('document-generator')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="document-generator">
+                    <div class="document-controls">
+                        <div class="document-control">
+                            <label for="document-type">文书类型</label>
+                            <select id="document-type" onchange="updateDocumentType()">
+                                <option value="notice">通知</option>
+                                <option value="certificate">认定书</option>
+                                <option value="notification">告知书</option>
+                            </select>
+                        </div>
+                        <div class="document-control">
+                            <label for="teacher-name">老师姓名</label>
+                            <input type="text" id="teacher-name" placeholder="输入老师姓名">
+                        </div>
+                        <div class="document-control">
+                            <label for="teacher-subject">学科</label>
+                            <select id="teacher-subject">
+                                <option value="语文">语文</option>
+                                <option value="数学">数学</option>
+                                <option value="英语">英语</option>
+                                <option value="物理">物理</option>
+                                <option value="化学">化学</option>
+                                <option value="生物">生物</option>
+                                <option value="历史">历史</option>
+                                <option value="地理">地理</option>
+                                <option value="政治">政治</option>
+                                <option value="体育">体育</option>
+                                <option value="美术">美术</option>
+                                <option value="音乐">音乐</option>
+                            </select>
+                        </div>
+                        <div class="document-control">
+                            <label for="issue-type">问题类型</label>
+                            <select id="issue-type" onchange="updateIssueType()">
+                                <option value="homework">作业多</option>
+                                <option value="overtime">拖堂</option>
+                                <option value="delay">延迟放学</option>
+                                <option value="occupy">占课</option>
+                                <option value="other">其他</option>
+                            </select>
+                        </div>
+                        <div class="document-control" id="custom-issue-container" style="display: none;">
+                            <label for="custom-issue">自定义问题</label>
+                            <input type="text" id="custom-issue" placeholder="输入具体问题">
+                        </div>
+                        <div class="document-control">
+                            <label for="document-content">正文内容</label>
+                            <textarea id="document-content" placeholder="输入文书正文内容..."></textarea>
+                        </div>
+                        <div class="document-control">
+                            <label for="document-stamp">选择印章</label>
+                            <select id="document-stamp">
+                                <option value="none">无印章</option>
+                                <option value="laoliu-seal">老六印章</option>
+                                <option value="laoliu-tech">老六科技</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="document-buttons">
+                        <button class="table-btn" onclick="generateDocument()">生成文书</button>
+                        <button class="table-btn secondary" onclick="downloadDocument()" id="download-document-btn" disabled>下载文书</button>
+                    </div>
+                    <div class="document-preview-container">
+                        <div class="document-preview" id="document-preview">
+                            <p>请填写表单并点击"生成文书"按钮</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 颜色选择器工具 -->
+            <div id="color-picker" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-palette"></i> 颜色选择器</h3>
+                    <button class="close-tool" onclick="closeTool('color-picker')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="color-picker-container">
+                    <div class="color-preview" id="color-preview" style="background-color: #00f2fe;"></div>
+                    <div class="color-controls">
+                        <div class="color-control">
+                            <label for="red">红色 (R)</label>
+                            <input type="range" id="red" min="0" max="255" value="0" oninput="updateColor()">
+                        </div>
+                        <div class="color-control">
+                            <label for="green">绿色 (G)</label>
+                            <input type="range" id="green" min="0" max="255" value="242" oninput="updateColor()">
+                        </div>
+                        <div class="color-control">
+                            <label for="blue">蓝色 (B)</label>
+                            <input type="range" id="blue" min="0" max="255" value="254" oninput="updateColor()">
+                        </div>
+                    </div>
+                    <div class="color-code">
+                        <input type="text" id="hex-code" value="#00f2fe" readonly>
+                        <button onclick="copyHexCode()">复制</button>
+                    </div>
+                    <div class="color-code">
+                        <input type="text" id="rgb-code" value="rgb(0, 242, 254)" readonly>
+                        <button onclick="copyRgbCode()">复制</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 二维码生成器工具 -->
+            <div id="qr-generator" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-qrcode"></i> 二维码生成器</h3>
+                    <button class="close-tool" onclick="closeTool('qr-generator')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="qr-generator-container">
+                    <div class="qr-controls">
+                        <div class="qr-control">
+                            <label for="qr-text">二维码内容</label>
+                            <input type="text" id="qr-text" placeholder="输入要编码的文本或URL" value="https://example.com">
+                        </div>
+                        <div class="qr-control">
+                            <label for="qr-size">二维码大小</label>
+                            <select id="qr-size">
+                                <option value="100">100x100</option>
+                                <option value="150" selected>150x150</option>
+                                <option value="200">200x200</option>
+                                <option value="250">250x250</option>
+                            </select>
+                        </div>
+                        <div class="qr-control">
+                            <label for="qr-color">二维码颜色</label>
+                            <input type="color" id="qr-color" value="#000000">
+                        </div>
+                        <div class="qr-control">
+                            <label for="qr-bg">背景颜色</label>
+                            <input type="color" id="qr-bg" value="#ffffff">
+                        </div>
+                    </div>
+                    <div class="qr-buttons">
+                        <button class="table-btn" onclick="generateQRCode()">生成二维码</button>
+                        <button class="table-btn secondary" onclick="downloadQRCode()" id="download-qr-btn" disabled>下载二维码</button>
+                    </div>
+                    <div class="qr-preview">
+                        <canvas id="qr-code"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 单位转换器工具 -->
+            <div id="unit-converter" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-exchange-alt"></i> 单位转换器</h3>
+                    <button class="close-tool" onclick="closeTool('unit-converter')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="unit-converter-container">
+                    <div class="unit-controls">
+                        <div class="unit-control">
+                            <label for="unit-category">转换类型</label>
+                            <select id="unit-category" onchange="updateUnitTypes()">
+                                <option value="length">长度</option>
+                                <option value="weight">重量</option>
+                                <option value="temperature">温度</option>
+                                <option value="area">面积</option>
+                                <option value="volume">体积</option>
+                                <option value="speed">速度</option>
+                            </select>
+                        </div>
+                        <div class="unit-control">
+                            <label for="from-value">数值</label>
+                            <input type="number" id="from-value" value="1" oninput="convertUnits()">
+                        </div>
+                        <div class="unit-control">
+                            <label for="from-unit">从</label>
+                            <select id="from-unit" onchange="convertUnits()"></select>
+                        </div>
+                        <div class="unit-control">
+                            <label for="to-unit">到</label>
+                            <select id="to-unit" onchange="convertUnits()"></select>
+                        </div>
+                    </div>
+                    <div class="unit-result" id="unit-result">
+                        1 米 = 100 厘米
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 密码生成器工具 -->
+            <div id="password-generator" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-key"></i> 密码生成器</h3>
+                    <button class="close-tool" onclick="closeTool('password-generator')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="password-generator-container">
+                    <div class="password-controls">
+                        <div class="password-control">
+                            <label for="password-length">密码长度</label>
+                            <input type="range" id="password-length" min="6" max="32" value="12" oninput="updatePasswordLength()">
+                            <span id="length-value">12</span>
+                        </div>
+                        <div class="password-control">
+                            <label for="include-uppercase">包含大写字母</label>
+                            <input type="checkbox" id="include-uppercase" checked>
+                        </div>
+                        <div class="password-control">
+                            <label for="include-numbers">包含数字</label>
+                            <input type="checkbox" id="include-numbers" checked>
+                        </div>
+                        <div class="password-control">
+                            <label for="include-symbols">包含特殊符号</label>
+                            <input type="checkbox" id="include-symbols">
+                        </div>
+                    </div>
+                    <div class="password-result">
+                        <input type="text" id="generated-password" readonly>
+                        <button onclick="generatePassword()"><i class="fas fa-sync-alt"></i></button>
+                        <button onclick="copyPassword()"><i class="fas fa-copy"></i></button>
+                    </div>
+                    <div class="password-strength" id="password-strength"></div>
+                    <div class="password-buttons" style="margin-top: 20px;">
+                        <button class="table-btn" onclick="generatePassword()">生成密码</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 文本工具 -->
+            <div id="text-tools" class="tool-container">
+                <div class="tool-header">
+                    <h3><i class="fas fa-font"></i> 文本工具</h3>
+                    <button class="close-tool" onclick="closeTool('text-tools')"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="text-tools-container">
+                    <div class="text-area-container">
+                        <div class="text-area">
+                            <label for="input-text">输入文本</label>
+                            <textarea id="input-text" placeholder="在这里输入要处理的文本..."></textarea>
+                        </div>
+                        <div class="text-area">
+                            <label for="output-text">输出文本</label>
+                            <textarea id="output-text" placeholder="处理后的文本将显示在这里..." readonly></textarea>
+                        </div>
+                    </div>
+                    <div class="text-tools-buttons">
+                        <button class="text-tool-btn" onclick="convertCase('upper')">大写转换</button>
+                        <button class="text-tool-btn" onclick="convertCase('lower')">小写转换</button>
+                        <button class="text-tool-btn" onclick="convertCase('title')">标题格式</button>
+                        <button class="text-tool-btn" onclick="reverseText()">反转文本</button>
+                        <button class="text-tool-btn" onclick="countCharacters()">字符统计</button>
+                        <button class="text-tool-btn" onclick="removeSpaces()">去除空格</button>
+                        <button class="text-tool-btn" onclick="countWords()">单词统计</button>
+                        <button class="text-tool-btn" onclick="textToBinary()">转二进制</button>
+                        <button class="text-tool-btn" onclick="binaryToText()">二进制转文本</button>
+                        <button class="text-tool-btn" onclick="textToBase64()">Base64编码</button>
+                        <button class="text-tool-btn" onclick="base64ToText()">Base64解码</button>
+                        <button class="text-tool-btn primary" onclick="copyOutput()">复制结果</button>
+                        <button class="text-tool-btn" onclick="clearText()">清空文本</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section cyber-border">
+            <h2><i class="fas fa-robot"></i>AI快速访问</h2>
+            <div class="ai-grid">
+                <a href="https://chat.deepseek.com/" target="_blank" class="ai-button">
+                    <img src="https://via.placeholder.com/36/00f2fe/0f172a?text=DS" alt="DeepSeek">
+                    <span>DeepSeek</span>
+                </a>
+                
+                <a href="https://www.tongyi.com/qianwen/" target="_blank" class="ai-button">
+                    <img src="https://via.placeholder.com/36/4facfe/0f172a?text=TQ" alt="通义千问">
+                    <span>通义千问</span>
+                </a>
+                
+                <a href="https://www.doubao.com/chat/" target="_blank" class="ai-button">
+                    <img src="https://via.placeholder.com/36/4fd1c5/0f172a?text=DB" alt="豆包">
+                    <span>豆包</span>
+                </a>
+                
+                <a href="https://bot.n.cn/chathome?src=dh_bj" target="_blank" class="ai-button">
+                    <img src="https://via.placeholder.com/36/f87171/0f172a?text=NM" alt="纳米AI">
+                    <span>纳米AI</span>
+                </a>
+                
+                <a href="https://www.kimi.com/" target="_blank" class="ai-button">
+                    <img src="https://via.placeholder.com/36/34d399/0f172a?text=KM" alt="Kimi">
+                    <span>Kimi</span>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 老六科技工具 | 科技改变生活 · 创新引领未来</p>
+        </footer>
+    </div>
+    
+    <!-- 通知 -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <p id="notification-text">操作成功!</p>
+    </div>
+    
+    <!-- QR Code 生成库 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    
+    <!-- 表格导出库 -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- HTML转PDF库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // 工具控制函数
+        let currentTool = null;
+        
+        function openTool(toolId) {
+            if (currentTool) {
+                document.getElementById(currentTool).classList.remove('active');
+            }
+            document.getElementById(toolId).classList.add('active');
+            currentTool = toolId;
+            window.scrollTo({
+                top: document.getElementById(toolId).offsetTop - 20,
+                behavior: 'smooth'
+            });
+            
+            // 如果打开的是计算器，聚焦到页面以便接收键盘输入
+            if (toolId === 'calculator') {
+                document.body.focus();
+            }
+            
+            // 初始化特定工具
+            if (toolId === 'color-picker') {
+                updateColor();
+            } else if (toolId === 'qr-generator') {
+                generateQRCode();
+            } else if (toolId === 'unit-converter') {
+                updateUnitTypes();
+            } else if (toolId === 'password-generator') {
+                generatePassword();
+            }
+        }
+        
+        function closeTool(toolId) {
+            document.getElementById(toolId).classList.remove('active');
+            currentTool = null;
+        }
+        
+        // 计算器功能
+        let currentInput = '0';
+        let previousInput = '';
+        let operation = null;
+        let resetInput = false;
+        
+        function updateDisplay() {
+            const display = document.getElementById('calc-display');
+            display.textContent = currentInput;
+        }
+        
+        function appendToDisplay(value) {
+            if (currentInput === '0' || resetInput) {
+                currentInput = value;
+                resetInput = false;
+            } else {
+                currentInput += value;
+            }
+            updateDisplay();
+        }
+        
+        function clearCalculator() {
+            currentInput = '0';
+            previousInput = '';
+            operation = null;
+            updateDisplay();
+            showNotification('计算器已重置', 'success');
+        }
+        
+        function backspace() {
+            if (currentInput.length === 1) {
+                currentInput = '0';
+            } else {
+                currentInput = currentInput.slice(0, -1);
+            }
+            updateDisplay();
+        }
+        
+        function setOperation(op) {
+            if (operation !== null) calculate();
+            previousInput = currentInput;
+            operation = op;
+            resetInput = true;
+        }
+        
+        function calculate() {
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+            
+            if (isNaN(prev) || isNaN(current)) return;
+            
+            switch (operation) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+            
+            currentInput = result.toString();
+            operation = null;
+            resetInput = true;
+            updateDisplay();
+        }
+        
+        // 键盘支持
+        document.addEventListener('keydown', function(event) {
+            if (currentTool !== 'calculator') return;
+            
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9') {
+                appendToDisplay(key);
+            } else if (key === '.') {
+                if (!currentInput.includes('.')) {
+                    appendToDisplay('.');
+                }
+            } else if (key === '+' || key === '-' || key === '*' || key === '/') {
+                setOperation(key);
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape') {
+                clearCalculator();
+            } else if (key === 'Backspace') {
+                backspace();
+            } else if (key === '(' || key === ')') {
+                appendToDisplay(key);
+            }
+        });
+        
+        // 为计算器按钮添加事件监听器
+        document.querySelectorAll('.calc-btn').forEach(button => {
+            if (button.textContent.match(/[0-9.]/)) {
+                button.addEventListener('click', () => appendToDisplay(button.textContent));
+            } else if (button.textContent.match(/[+\-*/]/)) {
+                button.addEventListener('click', () => setOperation(button.textContent));
+            }
+        });
+        
+        // 表格生成器功能
+        let isEditing = false;
+        let tableData = [];
+        
+        function generateTable() {
+            const rows = parseInt(document.getElementById('rows').value);
+            const cols = parseInt(document.getElementById('cols').value);
+            const style = document.getElementById('table-style').value;
+            
+            // 初始化表格数据
+            tableData = [];
+            for (let i = 0; i < rows; i++) {
+                const row = [];
+                for (let j = 0; j < cols; j++) {
+                    row.push(i === 0 ? `标题 ${j+1}` : `行 ${i}, 列 ${j+1}`);
+                }
+                tableData.push(row);
+            }
+            
+            renderTable(style);
+            document.getElementById('edit-btn').disabled = false;
+            document.getElementById('download-btn').disabled = false;
+            isEditing = false;
+            showNotification('表格已生成!', 'success');
+        }
+        
+        function renderTable(style) {
+            let tableHTML = '<table>';
+            
+            // 表头
+            tableHTML += '<tr>';
+            for (let j = 0; j < tableData[0].length; j++) {
+                tableHTML += `<th>${tableData[0][j]}</th>`;
+            }
+            tableHTML += '</tr>';
+            
+            // 表格内容
+            for (let i = 1; i < tableData.length; i++) {
+                tableHTML += '<tr>';
+                for (let j = 0; j < tableData[i].length; j++) {
+                    if (isEditing) {
+                        tableHTML += `<td><input type="text" value="${tableData[i][j]}" 
+                            onchange="updateTableData(${i}, ${j}, this.value)"></td>`;
+                    } else {
+                        tableHTML += `<td>${tableData[i][j]}</td>`;
+                    }
+                }
+                tableHTML += '</tr>';
+            }
+            
+            tableHTML += '</table>';
+            
+            const preview = document.getElementById('table-preview');
+            preview.innerHTML = tableHTML;
+            
+            // 应用样式
+            const table = preview.querySelector('table');
+            table.className = style;
+        }
+        
+        function editTable() {
+            isEditing = !isEditing;
+            const editBtn = document.getElementById('edit-btn');
+            
+            if (isEditing) {
+                editBtn.textContent = '保存表格';
+                showNotification('进入编辑模式', 'success');
+            } else {
+                editBtn.textContent = '编辑表格';
+                showNotification('表格已保存', 'success');
+            }
+            
+            renderTable(document.getElementById('table-style').value);
+        }
+        
+        function updateTableData(row, col, value) {
+            tableData[row][col] = value;
+        }
+        
+        function downloadTable() {
+            if (tableData.length === 0) {
+                showNotification('请先生成表格!', 'warning');
+                return;
+            }
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            
+            // 将表格数据转换为工作表
+            const ws = XLSX.utils.aoa_to_sheet(tableData);
+            
+            // 将工作表添加到工作簿
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            
+            // 生成Excel文件并下载
+            XLSX.writeFile(wb, "表格数据.xlsx");
+            
+            showNotification('表格已下载!', 'success');
+        }
+        
+        // 老六书生成器功能
+        function updateDocumentType() {
+            const type = document.getElementById('document-type').value;
+            const contentTextarea = document.getElementById('document-content');
+            
+            // 根据文书类型设置默认内容
+            switch (type) {
+                case 'notice':
+                    contentTextarea.value = '经查，您存在以下问题，请及时整改：';
+                    break;
+                case 'certificate':
+                    contentTextarea.value = '经调查核实，确认您存在以下违规行为：';
+                    break;
+                case 'notification':
+                    contentTextarea.value = '特此告知您以下事项：';
+                    break;
+            }
+        }
+        
+        function updateIssueType() {
+            const issueType = document.getElementById('issue-type').value;
+            const customIssueContainer = document.getElementById('custom-issue-container');
+            
+            if (issueType === 'other') {
+                customIssueContainer.style.display = 'flex';
+            } else {
+                customIssueContainer.style.display = 'none';
+            }
+        }
+        
+        function getLawByIssueType(issueType) {
+            switch (issueType) {
+                case 'homework':
+                    return '《老六作业管理法》第36条 作业负担过重';
+                case 'overtime':
+                    return '《老六自由休息管理法》第6条 剥夺学生休息时间，侵犯学生财产权、时间权';
+                case 'delay':
+                    return '《老六放学管理法案》第3条 老六延迟放学触犯学生的时间权和个人权';
+                case 'occupy':
+                    return '《老六课程管理法》第86条 老师不得已学习为由乱占课，触犯了学生的选择权、时间权';
+                default:
+                    return '';
+            }
+        }
+        
+        function getConclusionByDocumentType(docType) {
+            switch (docType) {
+                case 'notice':
+                    return '请于收到本通知后3个工作日内整改完毕，并将整改情况书面报告。';
+                case 'certificate':
+                    return '经认定，上述行为已违反相关规定，将按有关规定处理。';
+                case 'notification':
+                    return '请知悉上述内容，并严格遵守相关规定。';
+                default:
+                    return '';
+            }
+        }
+        
+        function generateDocument() {
+            const docType = document.getElementById('document-type').value;
+            const teacherName = document.getElementById('teacher-name').value;
+            const teacherSubject = document.getElementById('teacher-subject').value;
+            const issueType = document.getElementById('issue-type').value;
+            const customIssue = document.getElementById('custom-issue').value;
+            const content = document.getElementById('document-content').value;
+            const stampType = document.getElementById('document-stamp').value;
+            
+            if (!teacherName) {
+                showNotification('请输入老师姓名!', 'warning');
+                return;
+            }
+            
+            // 获取当前日期
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const dateStr = `${year}年${month}月${day}日`;
+            
+            // 获取问题描述
+            let issueDesc = '';
+            if (issueType === 'other') {
+                issueDesc = customIssue || '未说明的具体问题';
+            } else {
+                const issueMap = {
+                    'homework': '布置作业过多',
+                    'overtime': '经常拖堂',
+                    'delay': '无故延迟放学',
+                    'occupy': '占用其他课程时间'
+                };
+                issueDesc = issueMap[issueType] || '未说明的具体问题';
+            }
+            
+            // 获取法律依据
+            const law = issueType !== 'other' ? getLawByIssueType(issueType) : '';
+            
+            // 获取结论
+            const conclusion = getConclusionByDocumentType(docType);
+            
+            // 生成文书标题
+            let title = '';
+            switch (docType) {
+                case 'notice':
+                    title = '关于' + teacherName + teacherSubject + '老师' + issueDesc + '的通知';
+                    break;
+                case 'certificate':
+                    title = teacherName + teacherSubject + '老师' + issueDesc + '认定书';
+                    break;
+                case 'notification':
+                    title = '关于' + teacherName + teacherSubject + '老师' + issueDesc + '的告知书';
+                    break;
+            }
+            
+            // 构建文书HTML
+            let docHTML = `
+                <div class="red-header">老六科技教育管理文书</div>
+                <div class="title">${title}</div>
+                <div class="content">
+                    ${teacherName}${teacherSubject}老师：<br><br>
+                    ${content}<br><br>
+                    ${issueDesc}。${law ? '依据' + law + '，' : ''}${issueDesc}已违反相关规定。<br><br>
+                </div>
+                <div class="conclusion">${conclusion}</div>
+                <div class="slogan">科技基础决定作业效率！</div>
+                <div class="footer">
+                    <div class="stamp-container">
+                        ${dateStr}<br>
+                        老六网站终端运营制作
+                        ${stampType !== 'none' ? `<img src="${stampType === 'laoliu-seal' ? '老六印章.png' : '老六科技.png'}" class="stamp" alt="印章">` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // 更新预览
+            document.getElementById('document-preview').innerHTML = docHTML;
+            document.getElementById('download-document-btn').disabled = false;
+            
+            showNotification('文书已生成!', 'success');
+        }
+        
+        function downloadDocument() {
+            const { jsPDF } = window.jspdf;
+            const preview = document.getElementById('document-preview');
+            
+            html2canvas(preview).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210; // A4宽度
+                const pageHeight = 295; // A4高度
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                pdf.save('老六文书.pdf');
+                showNotification('文书已下载!', 'success');
+            });
+        }
+        
+        // 颜色选择器功能
+        function updateColor() {
+            const red = document.getElementById('red').value;
+            const green = document.getElementById('green').value;
+            const blue = document.getElementById('blue').value;
+            
+            const preview = document.getElementById('color-preview');
+            preview.style.backgroundColor = `rgb(${red}, ${green}, ${blue})`;
+            
+            // 更新HEX和RGB代码
+            document.getElementById('hex-code').value = rgbToHex(parseInt(red), parseInt(green), parseInt(blue));
+            document.getElementById('rgb-code').value = `rgb(${red}, ${green}, ${blue})`;
+        }
+        
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+        
+        function copyHexCode() {
+            const hexCode = document.getElementById('hex-code');
+            hexCode.select();
+            document.execCommand('copy');
+            showNotification('HEX代码已复制!', 'success');
+        }
+        
+        function copyRgbCode() {
+            const rgbCode = document.getElementById('rgb-code');
+            rgbCode.select();
+            document.execCommand('copy');
+            showNotification('RGB代码已复制!', 'success');
+        }
+        
+        // 二维码生成器功能
+        function generateQRCode() {
+            const text = document.getElementById('qr-text').value;
+            const size = parseInt(document.getElementById('qr-size').value);
+            const color = document.getElementById('qr-color').value;
+            const bgColor = document.getElementById('qr-bg').value;
+            
+            if (!text) {
+                showNotification('请输入二维码内容!', 'warning');
+                return;
+            }
+            
+            const canvas = document.getElementById('qr-code');
+            QRCode.toCanvas(canvas, text, {
+                width: size,
+                color: {
+                    dark: color,
+                    light: bgColor
+                }
+            }, function(error) {
+                if (error) {
+                    showNotification('生成二维码失败: ' + error, 'error');
+                } else {
+                    document.getElementById('download-qr-btn').disabled = false;
+                    showNotification('二维码已生成!', 'success');
+                }
+            });
+        }
+        
+        function downloadQRCode() {
+            const canvas = document.getElementById('qr-code');
+            const link = document.createElement('a');
+            link.download = '老六二维码.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showNotification('二维码已下载!', 'success');
+        }
+        
+        // 单位转换器功能
+        const unitData = {
+            length: {
+                units: ['米', '厘米', '毫米', '千米', '英寸', '英尺', '码', '英里'],
+                factors: [1, 100, 1000, 0.001, 39.3701, 3.28084, 1.09361, 0.000621371]
+            },
+            weight: {
+                units: ['千克', '克', '毫克', '吨', '磅', '盎司'],
+                factors: [1, 1000, 1000000, 0.001, 2.20462, 35.274]
+            },
+            temperature: {
+                units: ['摄氏度', '华氏度', '开尔文'],
+                factors: [1, 33.8, 274.15]
+            },
+            area: {
+                units: ['平方米', '平方厘米', '平方千米', '公顷', '平方英尺', '平方英里', '英亩'],
+                factors: [1, 10000, 0.000001, 0.0001, 10.7639, 0.000000386102, 0.000247105]
+            },
+            volume: {
+                units: ['升', '毫升', '立方米', '加仑(美)', '加仑(英)', '立方英尺', '立方英寸'],
+                factors: [1, 1000, 0.001, 0.264172, 0.219969, 0.0353147, 61.0237]
+            },
+            speed: {
+                units: ['公里/小时', '米/秒', '英里/小时', '节', '马赫'],
+                factors: [1, 0.277778, 0.621371, 0.539957, 0.000809848]
+            }
+        };
+        
+        function updateUnitTypes() {
+            const category = document.getElementById('unit-category').value;
+            const fromUnit = document.getElementById('from-unit');
+            const toUnit = document.getElementById('to-unit');
+            
+            // 清空现有选项
+            fromUnit.innerHTML = '';
+            toUnit.innerHTML = '';
+            
+            // 添加新选项
+            unitData[category].units.forEach(unit => {
+                const option1 = document.createElement('option');
+                option1.value = unit;
+                option1.textContent = unit;
+                fromUnit.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = unit;
+                option2.textContent = unit;
+                toUnit.appendChild(option2);
+            });
+            
+            // 设置不同的默认目标单位
+            if (category === 'length') {
+                toUnit.value = '厘米';
+            } else if (category === 'weight') {
+                toUnit.value = '克';
+            } else if (category === 'temperature') {
+                toUnit.value = '华氏度';
+            } else if (category === 'area') {
+                toUnit.value = '平方厘米';
+            } else if (category === 'volume') {
+                toUnit.value = '毫升';
+            } else if (category === 'speed') {
+                toUnit.value = '米/秒';
+            }
+            
+            convertUnits();
+        }
+        
+        function convertUnits() {
+            const category = document.getElementById('unit-category').value;
+            const fromValue = parseFloat(document.getElementById('from-value').value) || 0;
+            const fromUnit = document.getElementById('from-unit').value;
+            const toUnit = document.getElementById('to-unit').value;
+            
+            const units = unitData[category].units;
+            const factors = unitData[category].factors;
+            
+            const fromIndex = units.indexOf(fromUnit);
+            const toIndex = units.indexOf(toUnit);
+            
+            if (fromIndex === -1 || toIndex === -1) return;
+            
+            let result;
+            
+            if (category === 'temperature') {
+                // 温度转换需要特殊处理
+                result = convertTemperature(fromValue, fromUnit, toUnit);
+            } else {
+                // 其他单位转换
+                const baseValue = fromValue / factors[fromIndex];
+                result = baseValue * factors[toIndex];
+            }
+            
+            // 显示结果，保留4位小数
+            document.getElementById('unit-result').textContent = 
+                `${fromValue} ${fromUnit} = ${result.toFixed(4)} ${toUnit}`;
+        }
+        
+        function convertTemperature(value, fromUnit, toUnit) {
+            if (fromUnit === toUnit) return value;
+            
+            // 先转换为摄氏度
+            let celsius;
+            switch (fromUnit) {
+                case '摄氏度':
+                    celsius = value;
+                    break;
+                case '华氏度':
+                    celsius = (value - 32) * 5 / 9;
+                    break;
+                case '开尔文':
+                    celsius = value - 273.15;
+                    break;
+            }
+            
+            // 从摄氏度转换为目标单位
+            switch (toUnit) {
+                case '摄氏度':
+                    return celsius;
+                case '华氏度':
+                    return celsius * 9 / 5 + 32;
+                case '开尔文':
+                    return celsius + 273.15;
+            }
+        }
+        
+        // 密码生成器功能
+        function updatePasswordLength() {
+            const length = document.getElementById('password-length').value;
+            document.getElementById('length-value').textContent = length;
+            updatePasswordStrength(length);
+        }
+        
+        function generatePassword() {
+            const length = parseInt(document.getElementById('password-length').value);
+            const includeUppercase = document.getElementById('include-uppercase').checked;
+            const includeNumbers = document.getElementById('include-numbers').checked;
+            const includeSymbols = document.getElementById('include-symbols').checked;
+            
+            let charset = 'abcdefghijklmnopqrstuvwxyz';
+            if (includeUppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (includeNumbers) charset += '0123456789';
+            if (includeSymbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+            
+            document.getElementById('generated-password').value = password;
+            updatePasswordStrength(length);
+            showNotification('新密码已生成!', 'success');
+        }
+        
+        function copyPassword() {
+            const passwordField = document.getElementById('generated-password');
+            passwordField.select();
+            document.execCommand('copy');
+            showNotification('密码已复制!', 'success');
+        }
+        
+        function updatePasswordStrength(length) {
+            const strengthBar = document.getElementById('password-strength');
+            let strength = 0;
+            let color = '';
+            
+            if (length >= 8) strength += 1;
+            if (length >= 12) strength += 1;
+            if (document.getElementById('include-uppercase').checked) strength += 1;
+            if (document.getElementById('include-numbers').checked) strength += 1;
+            if (document.getElementById('include-symbols').checked) strength += 2;
+            
+            if (strength <= 2) {
+                color = 'var(--danger-color)';
+            } else if (strength <= 4) {
+                color = 'var(--warning-color)';
+            } else {
+                color = 'var(--success-color)';
+            }
+            
+            strengthBar.style.width = `${(strength / 6) * 100}%`;
+            strengthBar.style.background = color;
+        }
+        
+        // 文本工具功能
+        function convertCase(type) {
+            const input = document.getElementById('input-text').value;
+            let output = '';
+            
+            switch (type) {
+                case 'upper':
+                    output = input.toUpperCase();
+                    break;
+                case 'lower':
+                    output = input.toLowerCase();
+                    break;
+                case 'title':
+                    output = input.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                    break;
+            }
+            
+            document.getElementById('output-text').value = output;
+        }
+        
+        function reverseText() {
+            const input = document.getElementById('input-text').value;
+            document.getElementById('output-text').value = input.split('').reverse().join('');
+        }
+        
+        function countCharacters() {
+            const input = document.getElementById('input-text').value;
+            const count = input.length;
+            document.getElementById('output-text').value = `字符数: ${count}`;
+        }
+        
+        function removeSpaces() {
+            const input = document.getElementById('input-text').value;
+            document.getElementById('output-text').value = input.replace(/\s+/g, '');
+        }
+        
+        function countWords() {
+            const input = document.getElementById('input-text').value;
+            const words = input.trim() === '' ? 0 : input.trim().split(/\s+/).length;
+            document.getElementById('output-text').value = `单词数: ${words}`;
+        }
+        
+        function textToBinary() {
+            const input = document.getElementById('input-text').value;
+            let binary = '';
+            
+            for (let i = 0; i < input.length; i++) {
+                const charCode = input.charCodeAt(i);
+                binary += charCode.toString(2).padStart(8, '0') + ' ';
+            }
+            
+            document.getElementById('output-text').value = binary.trim();
+        }
+        
+        function binaryToText() {
+            const input = document.getElementById('input-text').value;
+            const binaryArray = input.split(' ');
+            let text = '';
+            
+            for (let i = 0; i < binaryArray.length; i++) {
+                const charCode = parseInt(binaryArray[i], 2);
+                text += String.fromCharCode(charCode);
+            }
+            
+            document.getElementById('output-text').value = text;
+        }
+        
+        function textToBase64() {
+            const input = document.getElementById('input-text').value;
+            document.getElementById('output-text').value = btoa(encodeURIComponent(input).replace(/%([0-9A-F]{2})/g, (match, p1) => {
+                return String.fromCharCode('0x' + p1);
+            }));
+        }
+        
+        function base64ToText() {
+            const input = document.getElementById('input-text').value;
+            try {
+                document.getElementById('output-text').value = decodeURIComponent(atob(input).split('').map(c => {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+            } catch (e) {
+                document.getElementById('output-text').value = '无效的Base64编码!';
+            }
+        }
+        
+        function copyOutput() {
+            const output = document.getElementById('output-text');
+            output.select();
+            document.execCommand('copy');
+            showNotification('结果已复制!', 'success');
+        }
+        
+        function clearText() {
+            document.getElementById('input-text').value = '';
+            document.getElementById('output-text').value = '';
+        }
+        
+        // 通知功能
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = message;
+            
+            // 重置通知类
+            notification.className = 'notification';
+            notification.classList.add(type);
+            notification.classList.add('show');
+            
+            // 更新图标
+            const icon = notification.querySelector('i');
+            icon.className = 'fas ' + 
+                (type === 'success' ? 'fa-check-circle' : 
+                 type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+            
+            // 自动隐藏
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化文书类型
+            updateDocumentType();
+            
+            // 初始化单位转换器
+            updateUnitTypes();
+            
+            // 初始化密码生成器
+            generatePassword();
+            
+            // 初始化颜色选择器
+            updateColor();
+        });
+    </script>
+</body>
+</html>
